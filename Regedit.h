@@ -49,7 +49,7 @@ namespace Registry
         if (result != ERROR_SUCCESS)
         {
             std::string errormsg = "[ERROR]RegOpenKeyExW - " + strhkey + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\n" + CheckErrorCode(result);
-            WriteAppLog(errormsg);
+            Helper::WriteAppLog(errormsg);
             return FALSE;
         }
         else
@@ -61,7 +61,7 @@ namespace Registry
             if (qResult != ERROR_SUCCESS)
             {
                 std::string errormsg = "[ERROR]RegQueryValueExW - " + strhkey + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\n" + CheckErrorCode(result);
-                WriteAppLog(errormsg);
+                Helper::WriteAppLog(errormsg);
                 return FALSE;
             }
             else
@@ -104,14 +104,14 @@ namespace Registry
         else
         {
             std::string errormsg = "[ERROR]RegCreateKeyExW - " + strhkey + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\n" + CheckErrorCode(result);
-            WriteAppLog(errormsg)
+            Helper::WriteAppLog(errormsg);
             return FALSE;
         }
 
         if (!success)
         {
             std::string errormsg = "[ERROR]RegSetValueExW - " + strhkey + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\n" + CheckErrorCode(result);
-            WriteAppLog(errormsg)
+            Helper::WriteAppLog(errormsg);
             return FALSE;
         }
 
@@ -133,26 +133,28 @@ namespace Registry
 
             if (IsRegistered(key,AppName))
             {
-                WriteAppLog("[:D]This App is already installed");
+                Helper::WriteAppLog("[:D]This App is already installed");
                 return;
             }
             else
             {
+                std::wstring ws(PathToExe);
+                std::string str(ws.begin(),ws.end());
                 if (Register(key,AppName, PathToExe, L""))
                 {
-                    WriteAppLog("[;)]Installation the registry was successful : HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + PathToExe);
+                    Helper::WriteAppLog("[;)]Installation the registry was successful : HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + str);
                 }
                 else
                 {
-                    WriteAppLog("[:(]INSTALLATION FAILED : HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + PathToExe + "\nTrying to install at HKEY_CURRENT_USER...");
+                    Helper::WriteAppLog("[:(]INSTALLATION FAILED : HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + str + "\nTrying to install at HKEY_CURRENT_USER...");
                     key = HKEY_CURRENT_USER;
                     if (Register(key,AppName, PathToExe, L""))
                     {
-                        WriteAppLog("[;)]Installation the registry was successful : HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + PathToExe);
+                        Helper::WriteAppLog("[;)]Installation the registry was successful : HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + str);
                     }
                     else
                     {
-                        WriteAppLog("[:(]INSTALLATION FAILED : HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + PathToExe);
+                        Helper::WriteAppLog("[:(]INSTALLATION FAILED : HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + str);
                     }
                 }
             }

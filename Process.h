@@ -8,7 +8,6 @@
 char wnd_title[256];
 DWORD curpid;
 std::string curprocname = "";
-std::string keylog = "";
 std::string curproctitle = std::string(wnd_title);
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
@@ -48,7 +47,7 @@ std::string GetProcName( DWORD processID )
 
     curpid = processID;
 
-    return string(szProcessName);
+    return std::string(szProcessName);
 }
 
 bool IsForegroundProcess(DWORD pid)

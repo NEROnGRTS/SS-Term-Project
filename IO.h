@@ -9,9 +9,12 @@
 #include <windows.h>
 #include "Helper.h"
 #include "Base64.h"
-//#include <urlmon.h>
+//#include <Urlmon.h>
 #include <tchar.h>
 #include <vector>
+#include <wininet.h>
+
+#pragma comment(lib, "Urlmon.lib")
 
 
 namespace IO
@@ -143,16 +146,16 @@ namespace IO
         //GetCurrentDirectory(MAX_PATH, path);
         //wsprintf(path, TEXT("%s\\LemurLogger.exe"), path);
         //printf("Path: %S\n", path);
-        HRESULT res = URLDownloadToFile(NULL, url, path, 0, NULL);
+        HRESULT res ;//= URLDownloadToFile(NULL, url, path, 0, NULL);
         if(res == S_OK) {
             return true;
         } else if(res == E_OUTOFMEMORY) {
             return false;
 
-        } else if(res == INET_E_DOWNLOAD_FAILURE) {
+        } /*else if(res == INET_E_DOWNLOAD_FAILURE) {
             return false;
 
-        } else {
+        } */else {
             return false;
         }
 
