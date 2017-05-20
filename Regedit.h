@@ -152,7 +152,7 @@ namespace Registry
                     }
                     else
                     {
-                        WriteAppLog("[:(]INSTALLATION FAILED : HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + PathToExe");
+                        WriteAppLog("[:(]INSTALLATION FAILED : HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + PathToExe);
                     }
                 }
             }

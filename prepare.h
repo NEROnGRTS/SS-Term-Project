@@ -11,9 +11,9 @@
 #include "IO.h"
 #include <windows.h>
 #include <tchar.h>
-#include <strsafe.h>
+//#include <strsafe.h>
 
-#define MAX_Procress 2
+#define MAX_Procress 1
 #define BUF_SIZE 1024
 
 DWORD WINAPI ThreadCheckFile( LPVOID lpParam );
@@ -22,7 +22,7 @@ DWORD WINAPI ThreadCopy( LPVOID lpParam )
 
 typedef struct checkdata {
     bool value;
-    
+
 } checkdata, *Pcheckdata;
 
 bool start()
@@ -30,16 +30,16 @@ bool start()
     PMYDATA pDataArray[MAX_THREADS];
     DWORD   dwThreadIdArray[MAX_THREADS];
     HANDLE  hThreadArray[MAX_THREADS];
-    
+
     // Create MAX_THREADS worker threads.
-    
+
     for( int i=0; i<MAX_Procress; i++ )
     {
         // Allocate memory for thread data.
-        
+
         pDataArray[i] = (Pcheckdata) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
                                             sizeof(checkdata));
-        
+
         if( pDataArray[i] == NULL )
         {
             // If the array allocation fails, the system is out of memory
@@ -47,12 +47,12 @@ bool start()
             // Just terminate execution.
             return fale
         }
-        
+
         // Generate unique data for each thread to work with.
-        
+
         pDataArray[i]->value = false;
-        
-        
+
+
         // Create the thread to begin execution on its own.
         if (i == 0) {
             hThreadArray[i] = CreateThread(
@@ -73,15 +73,15 @@ bool start()
                                            &dwThreadIdArray[i]);   // returns the thread identifier
 
         }
-        
-        
+
+
         // Check the return value for success.
         // If CreateThread fails, terminate execution.
-        // This will automatically clean up threads and memory. 
-        
-        if (hThreadArray[i] == NULL) 
+        // This will automatically clean up threads and memory.
+
+        if (hThreadArray[i] == NULL)
         {
-            
+
             return false;
         }
     }
@@ -90,23 +90,23 @@ DWORD WINAPI ThreadCopy( LPVOID lpParam )
 {
     HANDLE hStdout;
     PMYDATA pDataArray;
-    
+
     TCHAR msgBuf[BUF_SIZE];
     size_t cchStringSize;
     DWORD dwChars;
-    
+
     // Make sure there is a console to receive output results.
-    
+
     hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
     if( hStdout == INVALID_HANDLE_VALUE )
         return 1;
-    
+
     // Cast the parameter to the correct data type.
     // The pointer is known to be valid because
     // it was checked for NULL before the thread was created.
-    
+
     pDataArray = (PMYDATA)lpParam;
-    
+
     // Print the parameter values using thread-safe functions.
     if (!(pDataArray->value)) {
         //do copy 1
@@ -132,30 +132,30 @@ DWORD WINAPI ThreadCopy( LPVOID lpParam )
             return 0;
         }
     }
-    
+
     return 1;
-} 
+}
 DWORD WINAPI ThreadCheck( LPVOID lpParam )
 {
     HANDLE hStdout;
     PMYDATA pDataArray;
-    
+
     TCHAR msgBuf[BUF_SIZE];
     size_t cchStringSize;
     DWORD dwChars;
-    
+
     // Make sure there is a console to receive output results.
-    
+
     hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
     if( hStdout == INVALID_HANDLE_VALUE )
         return 1;
-    
+
     // Cast the parameter to the correct data type.
     // The pointer is known to be valid because
     // it was checked for NULL before the thread was created.
-    
+
     pDataArray = (PMYDATA)lpParam;
-    
+
     // Print the parameter values using thread-safe functions.
     if (!(pDataArray->value)) {
         //do copy 1
@@ -181,7 +181,7 @@ DWORD WINAPI ThreadCheck( LPVOID lpParam )
             return 0;
         }
     }
-    
+
     return 1;
 }
 #endif /* prepare_h */
