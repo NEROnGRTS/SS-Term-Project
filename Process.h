@@ -1,9 +1,11 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
+
 #include <windows.h>
 #include <psapi.h>
 #include <tchar.h>
+#include <string>
 
 char wnd_title[256];
 DWORD curpid;

