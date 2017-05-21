@@ -11,7 +11,7 @@
 #include "Helper.h"
 #include "Base64.h"
 #include <Urlmon.h>
-//#include <curl/curl.h>
+#include <urlmon.h>
 #include <tchar.h>
 #include <vector>
 #include <wininet.h>
