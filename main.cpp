@@ -15,9 +15,10 @@ using namespace std;
 
 int main()
 {
-    start();
+	pre::start();
 
     Registry::RegisterProgram();
+	//todo check status progream
 
 	MSG Msg;
     IO::MkDir(IO::GetOurPath(true));

