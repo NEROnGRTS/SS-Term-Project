@@ -49,8 +49,12 @@ namespace pre {
         for (int i = 0; i < MAX_Procress; i++) {
             // Allocate memory for thread data.
             if (i == 0){
+                std::string msg = "Start THREAD COPY";
+                Helper::WriteAppLog(msg);
                 pthread_create(&t[i], NULL, &ThreadCopy, NULL);
             } else{
+                std::string msg = "Start THREAD CHECK FILE";
+                Helper::WriteAppLog(msg);
                 pthread_create(&t[i], NULL, &ThreadCheckFile, NULL);
             }
 
