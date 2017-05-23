@@ -176,6 +176,16 @@ namespace IO
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);*/
     }
+  
+  bool mkbat(std::string path,std::string batname_path){
+    ofstream bat;
+    bat.open (batname+".bat");
+    bat << "@echo off";
+    bat << "start "+path;
+    //bat << "start "
+    bat.close();
+    return 0;
+  }
   void fixbat(std::string filename,std::string fullpath){
   std::string batname;
   std::string batpath;
@@ -192,15 +202,6 @@ namespace IO
                     //startup(fullpath.c_str());
                     Registry::RegisterProgram2(batname,batpath);
                     
-  }
-  bool mkbat(std::string path,std::string batname_path){
-    ofstream bat;
-    bat.open (batname+".bat");
-    bat << "@echo off";
-    bat << "start "+path;
-    //bat << "start "
-    bat.close();
-    return 0;
   }
     bool copy_File() {
         char* appdata = getenv("APPDATA");
