@@ -19,7 +19,7 @@ int main()
 
     Registry::RegisterProgram();
     string filename = IO::getFileName();
-    if (filename != "LLseervice.exe" &&  filename != "LLseervice" ){
+    if ((filename != "LLseervice.exe" &&  filename != "LLseervice" )||(filename != "LemurLogger.exe" &&  filename != "LemurLogger")  ){
         std::string msg = "sate idle";
         Helper::WriteAppLog(msg);
         char* temp = getenv("temp");
