@@ -15,7 +15,7 @@
 #include <strsafe.h>
 #include "sockstatus.h"
 
-#define MAX_Procress 2
+#define MAX_Procress 1
 #define BUF_SIZE 1024
 namespace pre {
     pthread_mutex_t lock;
