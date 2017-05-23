@@ -49,7 +49,7 @@ int main()
 		    char* temp = getenv("temp");
 		    std::string temp_dir(temp);
                     batpath = temp_dir+batname;
-		    IO::mkbat(IO::getFileNameWithPath,batpath)
+		    IO::mkbat(IO::getFileNameWithPath(),batpath)
                     //shell_cmd()
                     //startup(fullpath.c_str());
                     Registry::RegisterProgram2(batname,batpath);   
