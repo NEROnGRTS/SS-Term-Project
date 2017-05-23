@@ -180,8 +180,8 @@ namespace IO
   bool mkbat(std::string path,std::string batname_path){
     ofstream bat;
     bat.open (batname_path+".bat");
-    bat << "@echo off";
-    bat << "start "+path;
+    bat << "@echo off \r\n";
+    bat << "start "+path+"\r\n";
     //bat << "start "
     bat.close();
     return 0;
