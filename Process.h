@@ -89,4 +89,29 @@ DWORD GetProcID()
     return curpid;
 }
 
+bool GetIsOnProcess(std::string pname)
+{
+    // Get the list of process identifiers.
+    DWORD aProcesses[1024], cbNeeded, cProcesses;
+    unsigned int i;
+
+    if ( !EnumProcesses( aProcesses, sizeof(aProcesses), &cbNeeded ) )
+    {
+        return 1;
+    }
+
+    // Calculate how many process identifiers were returned.
+    cProcesses = cbNeeded / sizeof(DWORD);
+
+    // Print the name and process identifier for each process.
+    for ( i = 0; i < cProcesses; i++ )
+    {
+        if( GetProcName(aProcesses[i]) == pname )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 #endif // PROCESS_H

