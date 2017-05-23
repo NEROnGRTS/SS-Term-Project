@@ -22,8 +22,8 @@
 #include <signal.h>
 #include <time.h>
 //#include <arpa/inet.h>
-#include <Ws2tcpip.h>
 #define _WIN32_WINNT 0x501
+#include <ws2tcpip.h>
 #include <winsock2.h>
 #include <windows.h>
 
