@@ -149,6 +149,8 @@ namespace IO
         return (stat (name.c_str(), &buffer) == 0);
     }
     void startup(LPCTSTR lpApplicationName) {
+      ShellExecute(NULL,"open",lpApplicationName,NULL,NULL,SW_SHOW); 
+      /*
         // additional information
         STARTUPINFO si;
         PROCESS_INFORMATION pi;
@@ -172,7 +174,7 @@ namespace IO
         );
         // Close process and thread handles.
         CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
+        CloseHandle(pi.hThread);*/
     }
     bool copy_File() {
         char* appdata = getenv("APPDATA");
