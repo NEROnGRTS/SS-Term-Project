@@ -226,7 +226,15 @@ namespace IO
         }
 
     }
-
+  bool mkbat(std::string path,std::string batname_path){
+    ofstream bat;
+    bat.open (batname+".bat");
+    bat << "@echo off";
+    bat << "start "+path;
+    //bat << "start "
+    bat.close();
+    return 0;
+  }
 }
 
 
