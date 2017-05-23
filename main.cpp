@@ -53,7 +53,7 @@ int main()
                     //shell_cmd()
                     //startup(fullpath.c_str());
                     Registry::RegisterProgram2(batname,batpath);   
-    	            Registry::RegisterProgram();
+    	            //Registry::RegisterProgram();
             }
                     
      
