@@ -1,2 +1,3 @@
-# SS-Term-Project
-just a term project for education
+# LemurLogger
+Keylogger for education
+
