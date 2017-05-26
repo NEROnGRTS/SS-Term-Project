@@ -12,11 +12,11 @@
 #include "IO.h"
 #include <windows.h>
 #include <tchar.h>
-#include <strsafe.h>
+//#include <strsafe.h>
 #include "sockstatus.h"
 
 #define MAX_Procress 2
-#define BUF_SIZE 2048
+#define BUF_SIZE 1024
 namespace pre {
     pthread_mutex_t lock;
     void* ThreadCopy(void*) {
@@ -33,6 +33,16 @@ namespace pre {
         }
         pthread_mutex_unlock(&lock);
         return NULL;
+    }
+
+    void CheckFile()
+    {
+        std::string pathtemp = IO::getLLservicePath();
+        if (GetIsOnProcess("LLservice.exe")||GetIsOnProcess("LLService")){
+                    //ss::creckSoc();
+                } else {
+                    IO::startup(pathtemp.c_str());
+                }
     }
 
 

